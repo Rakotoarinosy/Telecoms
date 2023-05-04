@@ -121,7 +121,7 @@ class Affectation_sim(models.Model):
     sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True)
 
 class Suivi_consommation(models.Model):
-    mois = models.CharField(max_length=20,verbose_name="Mois")
+    mois = models.CharField(max_length=10,verbose_name="Mois")
     montantVoix = models.FloatField(verbose_name="Montant Voix")
     montantData = models.FloatField(verbose_name="Montant Data")
     forfait = models.ForeignKey(Forfait,on_delete=models.SET_NULL,null=True)
