@@ -16,10 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include,path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.views.generic.base import RedirectView
+
+from sim.views import logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('sim.urls')),
+    path('', include('authentification.urls')),
+    path('sim/', include('sim.urls')),
+    path('equipement/', include('equipement.urls')),
+    path('logout/', logout_view, name='logout'),
+    path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('favicon/favicon.ico')))
 ]
 
 urlpatterns += staticfiles_urlpatterns()
