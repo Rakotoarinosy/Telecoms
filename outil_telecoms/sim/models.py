@@ -1,6 +1,9 @@
-
+from django.core.exceptions import ValidationError
 from django.db import models
-
+# from django.db.models.signals import pre_save
+# from django.dispatch import receiver
+from django.db.models.functions import Lower
+from unidecode import unidecode
 
 # Create your models here.
 class Compte_facturation(models.Model):
@@ -10,7 +13,7 @@ class Ticket(models.Model):
     numero = models.CharField(max_length=50,verbose_name="Numéro ticket",)
     dateDemande = models.DateField(verbose_name="Date de demande")
     dateApprobation = models.DateField(verbose_name="Date d'approbation")
-    compte_facturation = models.ForeignKey(Compte_facturation,on_delete=models.SET_NULL, null=True)
+    compte_facturation = models.ForeignKey(Compte_facturation,on_delete=models.SET_NULL, null=True,verbose_name="Compte de Facturation")
 
 class Division(models.Model):
     libelle = models.CharField(max_length=10,verbose_name="Division",)
@@ -31,7 +34,7 @@ class Site(models.Model):
         return self.libelle
 
 class Etat(models.Model):
-    libelle = models.BooleanField(verbose_name="Actif",default=True) 
+    libelle = models.CharField(verbose_name="Etat",max_length=30,default="Actif")
     
     def __str__(self):
         return self.libelle
@@ -49,83 +52,82 @@ class Classe(models.Model):
         return self.libelle
 
 class Profil(models.Model):
-    libelle = models.CharField(max_length=40,verbose_name="Classe",)
-    etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True)
+    libelle = models.CharField(max_length=40,verbose_name="Profil",)
+    etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True,verbose_name="Etat")
         
     def __str__(self):
-        return self.libelle
-
+        return str(self.libelle)
 
 class Collaborateur(models.Model):
-    matricule = models.CharField(max_length=7,unique=True)
+    matricule = models.CharField(max_length=7,unique=True,verbose_name="Matricule")
     nom = models.CharField(max_length=150,verbose_name="Nom")
     prenom = models.CharField(max_length=150,verbose_name="Prénoms")
     fonction = models.CharField(max_length=150,verbose_name="Fonction")
-    division = models.ForeignKey(Division,on_delete=models.SET_NULL, null=True)
-    departement = models.ForeignKey(Departement,on_delete=models.SET_NULL, null=True)
-    site = models.ForeignKey(Site,on_delete=models.SET_NULL, null=True)
-    service = models.ForeignKey(Service,on_delete=models.SET_NULL, null=True)
-    classe = models.ForeignKey(Classe,on_delete=models.SET_NULL, null=True)
+    division = models.ForeignKey(Division,on_delete=models.SET_NULL, null=True,verbose_name="Division")
+    departement = models.ForeignKey(Departement,on_delete=models.SET_NULL, null=True,verbose_name="Département")
+    site = models.ForeignKey(Site,on_delete=models.SET_NULL, null=True,verbose_name="Site")
+    service = models.ForeignKey(Service,on_delete=models.SET_NULL, null=True,verbose_name="Service")
+    classe = models.ForeignKey(Classe,on_delete=models.SET_NULL, null=True,verbose_name="Classe")
     
     def __str__(self):
         return self.matricule
     
 class Operateur(models.Model):
-    identifiant = models.IntegerField()
+    identifiant = models.IntegerField(verbose_name="Identifiant")
     libelle = models.CharField(max_length=20,verbose_name="Opérateur")
     
     def __str__(self):
         return self.libelle
 
 class Acces_sim(models.Model):
-    libelle = models.CharField(max_length=20,verbose_name="Acces")
+    libelle = models.CharField(max_length=20,verbose_name="Accès")
     
     def __str__(self):
         return self.libelle
 
 class Type_sim(models.Model):
-    libelle = models.CharField(max_length=20,verbose_name="type SIM")
-    
+    libelle = models.CharField(max_length=20, unique=True, verbose_name="Type de SIM")
+
     def __str__(self):
         return self.libelle
 
 class Forfait(models.Model):
     libelle = models.CharField(max_length=20,verbose_name="Forfait")
-    montant = models.IntegerField()
-    montantPlafondVoix = models.IntegerField()
-    montantPlafondData = models.IntegerField()
-    plafondInterne = models.IntegerField()
-    typeSim = models.ForeignKey(Type_sim,on_delete=models.SET_NULL,null=True)
+    typeSim = models.ForeignKey(Type_sim,on_delete=models.SET_NULL,null=True,verbose_name="Type de SIM")
+    montant = models.IntegerField(verbose_name="Montant")
+    montantPlafondVoix = models.IntegerField(verbose_name="Montant Plafond Voix",blank=True,null=True)
+    montantPlafondData = models.IntegerField(verbose_name="Montant Plafond Data",blank=True,null=True)
+    plafondInterne = models.IntegerField(verbose_name="Plafond Interne")
     
     def __str__(self):
         return self.libelle
-    
+        
 class Sim(models.Model):
     numero = models.IntegerField(verbose_name="Numéro")
-    adresseIP = models.IntegerField(verbose_name="Adresse IP")
-    operateur = models.ForeignKey(Operateur,on_delete=models.SET_NULL,null=True)
-    forfait = models.ForeignKey(Forfait,on_delete=models.SET_NULL,null=True)
-    acces = models.ForeignKey(Acces_sim,on_delete=models.SET_NULL,null=True)
-    etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True)
+    adresseIP = models.CharField(verbose_name="Adresse IP")
+    operateur = models.ForeignKey(Operateur,on_delete=models.SET_NULL,null=True,verbose_name="Opérateur")
+    acces = models.ForeignKey(Acces_sim,on_delete=models.SET_NULL,null=True,verbose_name="Accès")
+    etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True,verbose_name="Etat")
+    forfait = models.ForeignKey(Forfait,on_delete=models.SET_NULL,null=True,verbose_name="Forfait")
     
     def __str__(self):
         return self.numero
 
 class Affectation_sim(models.Model):
-    dateAffectation = models.DateField(verbose_name="Date d'affectaion",auto_now=True)
-    dateActivation = models.DateField(verbose_name="Date d'activation",auto_now=True)
-    dateDesactivation = models.DateField(verbose_name="Date désactivation",auto_now=True)
-    dateModification = models.DateField(verbose_name="Date de Modification",auto_now=True)
-    collaborateur = models.ForeignKey(Collaborateur,on_delete=models.SET_NULL,null=True) 
-    ticket = models.ForeignKey(Ticket,on_delete=models.SET_NULL,null=True)
-    sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True)
+    dateAffectation = models.DateField(auto_now=True,verbose_name="Date d'affectation")
+    dateActivation = models.DateField(auto_now=True,verbose_name="Date d'activation")
+    dateDesactivation = models.DateField(auto_now=True,verbose_name="Date de désactivation")
+    dateModification = models.DateField(auto_now=True,verbose_name="Date de modification")
+    collaborateur = models.ForeignKey(Collaborateur,on_delete=models.SET_NULL,null=True,verbose_name="Collaborateur")
+    ticket = models.ForeignKey(Ticket,on_delete=models.SET_NULL,null=True,verbose_name="Numéro Ticket")
+    sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True,verbose_name="Numéro")
 
 class Suivi_consommation(models.Model):
     mois = models.CharField(max_length=10,verbose_name="Mois")
     montantVoix = models.FloatField(verbose_name="Montant Voix")
     montantData = models.FloatField(verbose_name="Montant Data")
-    forfait = models.ForeignKey(Forfait,on_delete=models.SET_NULL,null=True)
-    sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True)
+    forfait = models.ForeignKey(Forfait,on_delete=models.SET_NULL,null=True,verbose_name="Forfait")
+    sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True,verbose_name="Numéro")
 
 class Habilitation(models.Model):
     libellePage = models.CharField(max_length=60,verbose_name="Libelle Page")
@@ -133,5 +135,5 @@ class Habilitation(models.Model):
     vWrite = models.BooleanField(verbose_name="Création")
     vUpdate = models.BooleanField(verbose_name="Modification")
     vDelete = models.BooleanField(verbose_name="Suppression")
-    profile = models.ForeignKey(Profil,on_delete=models.SET_NULL,null=True)
-    
+    profile = models.ForeignKey(Profil,on_delete=models.SET_NULL,null=True,verbose_name="Profil")
+

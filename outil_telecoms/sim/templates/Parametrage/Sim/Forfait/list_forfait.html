@@ -1,0 +1,51 @@
+{% extends '../base_parametrage_sim.html' %} 
+{% block titre1 %}Parametrage SIM{% endblock titre1 %}
+{% block titre2 %}Forfait{% endblock titre2 %}
+
+{% block content %}
+  <div class="col-lg-6 mb-5 mb-lg-0 ">
+    <div class="card-body ">
+      <table id="profil" class="table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>Forfait</th>
+              <th>Type de SIM</th>
+              <th>Montant</th>
+              <th>Montant Plafond Voix</th>
+              <th>Montant Plafond Data</th>
+              <th>Montant Plafond Interne</th>
+              <th>Modifier</th>
+              <th>Supprimer</th>
+            </tr>
+          </thead>
+          {% for forfait in forfaits %}
+          <tbody>
+            <tr>
+              <td>{{forfait.id}}</td>
+              <td>{{ forfait.libelle }}</td>
+              <td>{{ forfait.typeSim }}</td>
+              <td>{{ forfait.montant }}</td>
+              <td>{{ forfait.montantPlafondVoix }}</td>
+              <td>{{ forfait.montantPlafondData }}</td>
+              <td>{{ forfait.plafondInterne }}</td>
+              <td><a href="{% url 'update_forfait' pk=forfait.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+              <td><a href="{% url 'delete_forfait' pk=forfait.pk %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+      </table>
+    </div>
+  </div> 
+  <div class="col-lg-5 mb-5 mb-lg-0 offset-1" style="z-index: 10">
+    <div class="card-body float-lg-end">
+      <a class="btn btn-success" href="{% url 'create_forfait' %}" style="background: #176F62;">Créer un nouveau forfait</a>
+    </div>
+  </div>
+    
+<script type="text/javascript" class="init">
+    $(document).ready(function() {
+        $('#profil').DataTable();
+    });
+</script>
+{% endblock content %}
