@@ -17,7 +17,7 @@ class ProfilForm(forms.ModelForm):
         }
     def clean_libelle(self):
         cleaned_libelle = unidecode(self.cleaned_data.get('libelle', ''))  # Supprimer les accents du libellé
-        existing_profil = Profil.objects.filter(libelle__iexact=cleaned_libelle).exists()
+        existing_profil = Profil.objects.filter(libelle__iexact=cleaned_libelle).exclude(id=self.instance.id).exists()
         if existing_profil:
             raise forms.ValidationError("Ce type de profil existe déjà.")
         return cleaned_libelle
@@ -32,7 +32,7 @@ class ProfilUpdateForm(forms.ModelForm):
         }
     def clean_libelle(self):
         cleaned_libelle = unidecode(self.cleaned_data.get('libelle', ''))  # Supprimer les accents du libellé
-        existing_profil = Profil.objects.filter(libelle__iexact=cleaned_libelle).exists()
+        existing_profil = Profil.objects.filter(libelle__iexact=cleaned_libelle).exclude(id=self.instance.id).exists()
         if existing_profil:
             raise forms.ValidationError("Ce type de profil existe déjà.")
         return cleaned_libelle
@@ -47,10 +47,9 @@ class OperateurForm(forms.ModelForm):
             'identifiant': forms.NumberInput(attrs={'class': 'form-control'}),
         }
     def clean_identifiant(self):
-        identifiant = self.cleaned_data.get('identifiant')
-
+        identifiant = self.cleaned_data.get('identifiant') 
         # Vérifier si l'identifiant existe déjà
-        if Operateur.objects.filter(identifiant=identifiant).exists():
+        if Operateur.objects.filter(identifiant=identifiant).exclude(id=self.instance.id).exists(): 
             raise ValidationError("Cet identifiant existe déjà.")
 
         return identifiant
@@ -64,7 +63,7 @@ class AccesForm(forms.ModelForm):
         }
     def clean_libelle(self):
         cleaned_libelle = unidecode(self.cleaned_data.get('libelle', ''))  # Supprimer les accents du libellé
-        existing_acces_sim = Acces_sim.objects.filter(libelle__iexact=cleaned_libelle).exists()
+        existing_acces_sim = Acces_sim.objects.filter(libelle__iexact=cleaned_libelle).exclude(id=self.instance.id).exists()
         if existing_acces_sim:
             raise forms.ValidationError("Ce type d'accès' existe déjà.")
         return cleaned_libelle        
@@ -79,7 +78,7 @@ class Type_SimForm(forms.ModelForm):
         
     def clean_libelle(self):
         cleaned_libelle = unidecode(self.cleaned_data.get('libelle', ''))  # Supprimer les accents du libellé
-        existing_type_sim = Type_sim.objects.filter(libelle__iexact=cleaned_libelle).exists()
+        existing_type_sim = Type_sim.objects.filter(libelle__iexact=cleaned_libelle).exclude(id=self.instance.id).exists()
         if existing_type_sim:
             raise forms.ValidationError("Ce type de SIM existe déjà.")
         return cleaned_libelle
@@ -104,7 +103,27 @@ class ForfaitForm(forms.ModelForm):
         
     def clean_libelle(self):
         cleaned_libelle = unidecode(self.cleaned_data.get('libelle', ''))  # Supprimer les accents du libellé
-        existing_forfait = Forfait.objects.filter(libelle__iexact=cleaned_libelle).exists()
+        existing_forfait = Forfait.objects.filter(libelle__iexact=cleaned_libelle).exclude(id=self.instance.id).exists()
+        if existing_forfait:
+            raise forms.ValidationError("Ce type de forfait existe déjà.")
+        return cleaned_libelle
+    
+class ForfaitFormUpdate(forms.ModelForm):
+    class Meta:
+        model = Forfait
+        fields = "__all__"
+        widgets = {
+            'libelle': forms.TextInput(attrs={'class': 'form-control'}),
+            'montant': forms.NumberInput(attrs={'class': 'form-control'}),
+            'montantPlafondVoix': forms.NumberInput(attrs={'class': 'form-control'}),
+            'montantPlafondData': forms.NumberInput(attrs={'class': 'form-control'}),
+            'plafondInterne': forms.NumberInput(attrs={'class': 'form-control'}),
+            'typeSim': forms.Select(attrs={'class': 'form-select', 'onchange': 'updateChampsAffiches();'}),
+        }
+        
+    def clean_libelle(self):
+        cleaned_libelle = unidecode(self.cleaned_data.get('libelle', ''))
+        existing_forfait = Forfait.objects.filter(libelle__iexact=cleaned_libelle).exclude(id=self.instance.id).exists()
         if existing_forfait:
             raise forms.ValidationError("Ce type de forfait existe déjà.")
         return cleaned_libelle
@@ -139,7 +158,6 @@ class SimForm(forms.ModelForm):
             
             
 class AffectationSimForm(forms.ModelForm):
-
     class Meta:
         model = Affectation_sim
         fields = "__all__"

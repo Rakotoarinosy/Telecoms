@@ -7,7 +7,7 @@ from django.views.generic.edit import DeleteView
 from django.views.generic import ListView
 from sim.models import *
 
-from sim.forms import AccesForm, AffectationSimForm, ForfaitForm, OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Type_SimForm
+from sim.forms import AccesForm, AffectationSimForm, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Type_SimForm
 
 from django.contrib.auth import logout
 from django.shortcuts import redirect
@@ -190,7 +190,7 @@ class ForfaitDeleteView(DeleteView):
     
 class ForfaitUpdateView(UpdateView):
     model = Forfait
-    form_class = ForfaitForm
+    form_class = ForfaitFormUpdate
     template_name = 'Parametrage/Sim/Forfait/update_forfait.html'
     success_url = reverse_lazy('list_forfait')
     
