@@ -7,8 +7,14 @@ urlpatterns = [
     path('home/',home,name='home'),
     path('parametrage/',parametrage,name='parametrage'),
     #SIM
+    path('affectation_sim/',AffectationSimCreateView.as_view(),name='affectation_sim'),
     path('create_affectation_sim/',AffectationSimCreateView.as_view(),name='create_affectation_sim'),
     path('list_affectation_sim/',AffectationSimListView.as_view(),name='list_affectation_sim'),
+    path('create_sim/',SimCreateView.as_view(),name='create_sim'),
+    path('combined-form/', combined_form_view, name='combined_form_view'),
+    #auto complète
+    path('get_forfait/', get_forfait, name='get_forfait'),
+    path('get_collaborateur/', get_collaborateur, name='get_collaborateur'),
     #PARAMETRAGE
     ##paramètrage sim
     ###profil
@@ -45,7 +51,6 @@ urlpatterns = [
     
     #test
     
-    path('create_sim/',SimCreateView.as_view(),name='create_sim'),
     # path('list_affectation_sim/',AffectationSimListView.as_view(),name='list_affectation_sim'),
 
 ]

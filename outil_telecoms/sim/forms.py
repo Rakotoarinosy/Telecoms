@@ -150,22 +150,48 @@ class SimForm(forms.ModelForm):
         if instance and instance.forfait:
             self.fields['forfait'].queryset = Forfait.objects.filter(id=instance.forfait.id)
             self.fields['forfait'].initial = instance.forfait.id
-            self.fields['montantPlafondVoix'] = forms.IntegerField(initial=instance.forfait.montantPlafondVoix, required=False)
-            self.fields['montantPlafondData'] = forms.IntegerField(initial=instance.forfait.montantPlafondData, required=False)
+            self.fields['montantPlafondVoix'] = forms.IntegerField(initial=instance.forfait.montantPlafondVoix, required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled',}))
+            self.fields['montantPlafondData'] = forms.IntegerField(initial=instance.forfait.montantPlafondData, required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled',}))
         else:
-            self.fields['montantPlafondVoix'] = forms.IntegerField(required=False)
-            self.fields['montantPlafondData'] = forms.IntegerField(required=False)
+            self.fields['montantPlafondVoix'] = forms.IntegerField(required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled',}))
+            self.fields['montantPlafondData'] = forms.IntegerField(required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled'}))
             
             
 class AffectationSimForm(forms.ModelForm):
+    collaborateur = forms.ModelChoiceField(queryset=Collaborateur.objects.all(), widget=forms.TextInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Affectation_sim
         fields = "__all__"
         widgets = {
             'ticket': forms.NumberInput(attrs={'class': 'form-control'}),
             'sim': forms.TextInput(attrs={'class': 'form-control'}),
-            'collaborateur': forms.TextInput(attrs={'class': 'form-control'}),
-        }      
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+        if instance and instance.forfait:
+            self.fields['collaborateur'].queryset = Collaborateur.objects.filter(id=instance.collaborateur.id)
+            self.fields['collaborateur'].initial = instance.collaborateur.id
+            self.fields['nom'] = forms.CharField(initial=instance.collaborateur.nom, required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
+            self.fields['prenom'] = forms.CharField(initial=instance.collaborateur.prenom, required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
+        else:
+            self.fields['nom'] = forms.IntegerField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
+            self.fields['prenom'] = forms.IntegerField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled'}))     
         
 
-        
+class CombinedForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.update(SimForm().fields)
+        self.fields.update(AffectationSimForm().fields)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Ajoutez ici votre logique de validation personnalisée si nécessaire
+        return cleaned_data
+
+    def save(self):
+        # Ajoutez ici votre logique d'enregistrement personnalisée si nécessaire
+        pass     

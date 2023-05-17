@@ -118,9 +118,9 @@ class Affectation_sim(models.Model):
     dateActivation = models.DateField(auto_now=True,verbose_name="Date d'activation")
     dateDesactivation = models.DateField(auto_now=True,verbose_name="Date de désactivation")
     dateModification = models.DateField(auto_now=True,verbose_name="Date de modification")
-    collaborateur = models.ForeignKey(Collaborateur,on_delete=models.SET_NULL,null=True,verbose_name="Collaborateur")
     ticket = models.ForeignKey(Ticket,on_delete=models.SET_NULL,null=True,verbose_name="Numéro Ticket")
     sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True,verbose_name="Numéro")
+    collaborateur = models.ForeignKey(Collaborateur,on_delete=models.SET_NULL,null=True,verbose_name="Collaborateur")
 
 class Suivi_consommation(models.Model):
     mois = models.CharField(max_length=10,verbose_name="Mois")

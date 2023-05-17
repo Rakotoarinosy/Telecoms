@@ -5,9 +5,11 @@ from django.views.generic.edit import CreateView,FormView
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import DeleteView
 from django.views.generic import ListView
+from django.http import JsonResponse
+from django.views import View
 from sim.models import *
 
-from sim.forms import AccesForm, AffectationSimForm, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Type_SimForm
+from sim.forms import AccesForm, AffectationSimForm, CombinedForm, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Type_SimForm
 
 from django.contrib.auth import logout
 from django.shortcuts import redirect
@@ -211,12 +213,28 @@ class AffectationSimCreateView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = self.get_form()
+        context['collaborateurs'] = Collaborateur.objects.all().values('id', 'nom', 'prenom')
         return context
+    
+# Auto complete_collaborateur_AffectationSimCreateView
+def get_collaborateur(request):
+    collaborateur_id = request.GET.get('collaborateur_id')  # Correction : utiliser 'collaborateur_id' au lieu de 'collaborateur'
+
+    try:
+        collaborateur = Collaborateur.objects.get(id=collaborateur_id)  # Correction : utiliser 'id' au lieu de 'collaborateur'
+        data = {
+            'nom': collaborateur.nom,
+            'prenom': collaborateur.prenom,
+        }
+        return JsonResponse(data)
+    except Collaborateur.DoesNotExist:
+        return JsonResponse({'error': 'Collaborateur introuvable'})
     
 class AffectationSimListView(ListView):
     model = Affectation_sim
     template_name = 'Sim/list_affectation_sim.html'
     context_object_name = 'affectationSims'
+
     
 class SimCreateView(FormView):
     form_class = SimForm
@@ -230,7 +248,33 @@ class SimCreateView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = self.get_form()
-        return context        
+        context['forfaits'] = Forfait.objects.all().values('id', 'montantPlafondVoix', 'montantPlafondData')
+        return context      
+    
+# Auto complete_forfait_SimCreateView
+def get_forfait(request):
+    forfait_id = request.GET.get('forfait_id')  # Correction : utiliser 'forfait_id' au lieu de 'forfait'
+
+    try:
+        forfait = Forfait.objects.get(id=forfait_id)  # Correction : utiliser 'id' au lieu de 'forfait'
+        data = {
+            'montantPlafondVoix': forfait.montantPlafondVoix,
+            'montantPlafondData': forfait.montantPlafondData,
+        }
+        return JsonResponse(data)
+    except Forfait.DoesNotExist:
+        return JsonResponse({'error': 'Forfait introuvable'})
+    
+def combined_form_view(request):
+    if request.method == 'POST':
+        form = CombinedForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Redirigez vers une autre page ou affichez un message de succès
+    else:
+        form = CombinedForm()
+    
+    return render(request, 'Sim/combined.html', {'form': form})
     
 #Division
 # class DivisionCreateView(CreateView):
