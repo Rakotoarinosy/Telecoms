@@ -8,6 +8,8 @@ from unidecode import unidecode
 # Create your models here.
 class Compte_facturation(models.Model):
     libelle = models.CharField(max_length=40,verbose_name="Compte de facturation",)
+    def __str__(self):
+        return self.libelle
 
 class Ticket(models.Model):
     numero = models.CharField(max_length=50,verbose_name="Numéro ticket",)
@@ -15,6 +17,9 @@ class Ticket(models.Model):
     dateApprobation = models.DateField(verbose_name="Date d'approbation")
     compte_facturation = models.ForeignKey(Compte_facturation,on_delete=models.SET_NULL, null=True,verbose_name="Compte de Facturation")
 
+    def __str__(self):
+        return str(self.numero)
+    
 class Division(models.Model):
     libelle = models.CharField(max_length=10,verbose_name="Division",)
     
@@ -59,7 +64,7 @@ class Profil(models.Model):
         return str(self.libelle)
 
 class Collaborateur(models.Model):
-    matricule = models.CharField(max_length=7,unique=True,verbose_name="Matricule")
+    matricule = models.CharField(unique=True,verbose_name="Matricule")
     nom = models.CharField(max_length=150,verbose_name="Nom")
     prenom = models.CharField(max_length=150,verbose_name="Prénoms")
     fonction = models.CharField(max_length=150,verbose_name="Fonction")
@@ -103,7 +108,7 @@ class Forfait(models.Model):
         return self.libelle
         
 class Sim(models.Model):
-    numero = models.IntegerField(verbose_name="Numéro")
+    numero = models.IntegerField(verbose_name="Numéro Téléphone")
     adresseIP = models.CharField(verbose_name="Adresse IP")
     operateur = models.ForeignKey(Operateur,on_delete=models.SET_NULL,null=True,verbose_name="Opérateur")
     acces = models.ForeignKey(Acces_sim,on_delete=models.SET_NULL,null=True,verbose_name="Accès")
@@ -111,7 +116,7 @@ class Sim(models.Model):
     forfait = models.ForeignKey(Forfait,on_delete=models.SET_NULL,null=True,verbose_name="Forfait")
     
     def __str__(self):
-        return self.numero
+         return str(self.numero)
 
 class Affectation_sim(models.Model):
     dateAffectation = models.DateField(auto_now=True,verbose_name="Date d'affectation")

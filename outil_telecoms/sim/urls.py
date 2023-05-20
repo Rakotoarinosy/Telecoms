@@ -1,4 +1,5 @@
 from django.urls import path
+from sim.forms import TicketForm
 
 from sim.views import *
 
@@ -11,7 +12,8 @@ urlpatterns = [
     path('create_affectation_sim/',AffectationSimCreateView.as_view(),name='create_affectation_sim'),
     path('list_affectation_sim/',AffectationSimListView.as_view(),name='list_affectation_sim'),
     path('create_sim/',SimCreateView.as_view(),name='create_sim'),
-    path('combined-form/', combined_form_view, name='combined_form_view'),
+    # path('combined-form/', CombinedFormView.as_view(), name='combined_form_view'),
+    # path('combined-form/', combined_form_view, name='combined_form_view'),
     #auto complète
     path('get_forfait/', get_forfait, name='get_forfait'),
     path('get_collaborateur/', get_collaborateur, name='get_collaborateur'),
@@ -52,5 +54,8 @@ urlpatterns = [
     #test
     
     # path('list_affectation_sim/',AffectationSimListView.as_view(),name='list_affectation_sim'),
+    path('ticket_Form/',TicketCreateView.as_view(),name='ticketForm'),
+    path('complet/',CombinedFormView1.as_view(),name='complet'),
+    # path('ticket_creat_sim/',Ticket_creat_sim.as_view(),name='ticket_creat_sim'),
 
 ]

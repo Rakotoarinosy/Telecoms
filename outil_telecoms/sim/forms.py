@@ -152,22 +152,40 @@ class SimForm(forms.ModelForm):
             self.fields['forfait'].initial = instance.forfait.id
             self.fields['montantPlafondVoix'] = forms.IntegerField(initial=instance.forfait.montantPlafondVoix, required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled',}))
             self.fields['montantPlafondData'] = forms.IntegerField(initial=instance.forfait.montantPlafondData, required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled',}))
+            self.fields['typeSim_id'] = forms.CharField(initial=instance.forfait.typeSim_id, required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled',}))
         else:
             self.fields['montantPlafondVoix'] = forms.IntegerField(required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled',}))
             self.fields['montantPlafondData'] = forms.IntegerField(required=False,widget=forms.NumberInput(attrs={'class':'form-control','disabled': 'disabled'}))
-            
+            self.fields['typeSim_id'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled'}))
+        
+        self.fields['montantPlafondVoix'].label = "Montant Plafond Voix"
+        self.fields['montantPlafondData'].label = "Montant Plafond Data"
+        self.fields['typeSim_id'].label = "Type de SIM "
+
+class TicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = "__all__"
+        widgets = {
+            'numero': forms.TextInput(attrs={'class': 'form-control'}),
+            'dateDemande': forms.DateInput(attrs={'class': 'form-control','type': 'date'}),
+            'dateApprobation': forms.DateInput(attrs={'class': 'form-control','type': 'date'}),
+            'compte_facturation': forms.Select(attrs={'class': 'form-control'}),
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['numero'].label = "Numéro Ticket"
+
             
 class AffectationSimForm(forms.ModelForm):
-    collaborateur = forms.ModelChoiceField(queryset=Collaborateur.objects.all(), widget=forms.TextInput(attrs={'class': 'form-control'}))
-
+    collaborateur = forms.ModelChoiceField(queryset=Collaborateur.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
     class Meta:
         model = Affectation_sim
         fields = "__all__"
         widgets = {
-            'ticket': forms.NumberInput(attrs={'class': 'form-control'}),
-            'sim': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-        
+            'ticket': forms.Select(attrs={'class': 'form-control'}),
+            'sim': forms.Select(attrs={'class': 'form-control'}),
+        }     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance')
@@ -177,13 +195,15 @@ class AffectationSimForm(forms.ModelForm):
             self.fields['nom'] = forms.CharField(initial=instance.collaborateur.nom, required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
             self.fields['prenom'] = forms.CharField(initial=instance.collaborateur.prenom, required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
         else:
-            self.fields['nom'] = forms.IntegerField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
-            self.fields['prenom'] = forms.IntegerField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled'}))     
+            self.fields['nom'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
+            self.fields['prenom'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled'}))     
         
-
-class CombinedForm(forms.Form):
+class CombinedCompletForm(forms.Form):
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields.update(TicketForm().fields)
         self.fields.update(SimForm().fields)
         self.fields.update(AffectationSimForm().fields)
 
@@ -192,6 +212,65 @@ class CombinedForm(forms.Form):
         # Ajoutez ici votre logique de validation personnalisée si nécessaire
         return cleaned_data
 
+    # def save(self):
+    #     # Ajoutez ici votre logique d'enregistrement personnalisée si nécessaire
+    #     pass   
     def save(self):
-        # Ajoutez ici votre logique d'enregistrement personnalisée si nécessaire
-        pass     
+        ticket_data = self.cleaned_data.get('ticket')
+        sim_data = self.cleaned_data.get('sim')
+        affectation_sim_data = self.cleaned_data.get('affectation_sim')
+
+        # Créer l'objet Ticket avec les données de ticket_data
+        ticket = Ticket.objects.create(**ticket_data)
+
+        # Créer l'objet Sim avec les données de sim_data
+        sim = Sim.objects.create(**sim_data)
+
+        # Créer l'objet Affectation_sim avec les données de affectation_sim_data
+        affectation_sim = Affectation_sim.objects.create(**affectation_sim_data)
+
+        # Effectuer les associations ForeignKey nécessaires
+        affectation_sim.ticket = ticket
+        affectation_sim.sim = sim
+        affectation_sim.save()
+
+# class Ticket_creat_simForm(forms.Form):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+        
+#         self.fields.update(TicketForm().fields)
+#         self.fields.update(SimForm().fields)
+
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         # Ajoutez ici votre logique de validation personnalisée si nécessaire
+#         return cleaned_data
+
+#     def save(self):
+#         # Ajoutez ici votre logique d'enregistrement personnalisée si nécessaire
+#         pass   
+    
+# class CombinedForm(forms.Form):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+        
+#         self.fields.update(SimForm().fields)
+#         self.fields.update(AffectationSimForm().fields)
+
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         # Ajoutez ici votre logique de validation personnalisée si nécessaire
+#         return cleaned_data
+
+#     def save(self):
+#         ticket_data = self.cleaned_data.get('ticket')
+#         sim_data = self.cleaned_data.get('sim')
+
+#         # Créez les objets Ticket, Sim et Affectation_sim avec les données du formulaire
+#         ticket = Ticket.objects.create(**ticket_data)
+#         sim = Sim.objects.create(**sim_data)
+
+#         # Effectuez les associations ForeignKey nécessaires
+#         sim.ticket = ticket
+#         sim.save()
+    

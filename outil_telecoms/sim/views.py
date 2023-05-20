@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from django.views import View
 from sim.models import *
 
-from sim.forms import AccesForm, AffectationSimForm, CombinedForm, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Type_SimForm
+from sim.forms import AccesForm, AffectationSimForm, CombinedCompletForm, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm,TicketForm, Type_SimForm
 
 from django.contrib.auth import logout
 from django.shortcuts import redirect
@@ -248,7 +248,7 @@ class SimCreateView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = self.get_form()
-        context['forfaits'] = Forfait.objects.all().values('id', 'montantPlafondVoix', 'montantPlafondData')
+        context['forfaits'] = Forfait.objects.all().values('id', 'montantPlafondVoix', 'montantPlafondData','typeSim_id')
         return context      
     
 # Auto complete_forfait_SimCreateView
@@ -260,22 +260,71 @@ def get_forfait(request):
         data = {
             'montantPlafondVoix': forfait.montantPlafondVoix,
             'montantPlafondData': forfait.montantPlafondData,
+            'typeSim_id': forfait.typeSim_id,
+            'plafondInterne': forfait.plafondInterne,
         }
         return JsonResponse(data)
     except Forfait.DoesNotExist:
         return JsonResponse({'error': 'Forfait introuvable'})
     
-def combined_form_view(request):
-    if request.method == 'POST':
-        form = CombinedForm(request.POST)
-        if form.is_valid():
-            form.save()
-            # Redirigez vers une autre page ou affichez un message de succès
-    else:
-        form = CombinedForm()
+# def combined_form_view(request):
+#     if request.method == 'POST':
+#         form = CombinedForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             # Redirigez vers une autre page ou affichez un message de succès
+#     else:
+#         form = CombinedForm()
     
-    return render(request, 'Sim/combined.html', {'form': form})
+#     return render(request, 'Sim/combined.html', {'form': form})
+
+class TicketCreateView(FormView):
+    template_name = 'Sim/create_ticket.html'
+    form_class = TicketForm
+    success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
     
+# class Ticket_creat_sim(FormView):
+#     template_name = 'Sim/Ticket_creat_sim.html'
+#     form_class = Ticket_creat_simForm
+#     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
+
+#     def form_valid(self, form):
+#         form.save()
+#         return super().form_valid(form)
+    
+# class CombinedFormView(FormView):
+#     template_name = 'Sim/combined.html'
+#     form_class = CombinedForm
+#     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
+
+#     def form_valid(self, form):
+#         form.save()
+#         return super().form_valid(form)
+    
+class CombinedFormView1(FormView):
+    template_name = 'Sim/combined1.html'
+    form_class = CombinedCompletForm
+    success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+# def CombinedFormView1(request):
+#     if request.method == 'POST':
+#         form = CombinedForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             # Redirigez vers une autre page ou affichez un message de succès
+#     else:
+#         form =  CombinedCompetForm
+    
+#     return render(request, 'Sim/combined1.html', {'form': form})
+
 #Division
 # class DivisionCreateView(CreateView):
 #     model = Division
