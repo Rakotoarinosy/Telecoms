@@ -11,7 +11,7 @@
             <form method="post">
                 {% csrf_token %}
 
-                <button class="btn btn-outline-danger" type="submit">Supprimer</button>
+                <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Voulez-vous vraiment supprimer l\'opérateur ?')">Supprimer</button>
                 {% block redirect %}
                 <a class="btn btn-outline-secondary" href="{% url 'list_operateur' %}">Annuler</a>
                 {% endblock redirect %}

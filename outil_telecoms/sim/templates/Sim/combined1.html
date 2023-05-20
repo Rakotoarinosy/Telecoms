@@ -5,7 +5,7 @@
 
 <div class="row mb-5 mt-5">
     <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
-        <h1 class="text-center">create sim</h1>
+        <h1 class="text-center">Creation et Affectation SIM</h1>
             <form class="card-body px-4 py-5 px-md-5" method="post">{% csrf_token %} 
                 {{ form.as_p }}
                 <input class="btn btn-success mt-2" type="submit" style="background: #176F62;" value="Créer">
@@ -27,6 +27,7 @@
       var typeSim_idField = $("#id_typeSim_id");
       
       var selectedForfait = forfaitField.val();
+      
       // Requête AJAX pour récupérer les données du forfait sélectionné
       $.ajax({
         url: "{% url 'get_forfait' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
@@ -55,5 +56,39 @@
     forfaitField.on("change", updatePlafondFields);
   });
 </script>
+<script>
+    $(document).ready(function() {
+      // Fonction de mise à jour des champs
+      function updatePlafondFields() {
+        var collaborateurField = $("#id_collaborateur");
+        var nomField = $("#id_nom");
+        var prenomField = $("#id_prenom");
+        
+        var selectedCollaborateur = collaborateurField.val();
+        
+        // Requête AJAX pour récupérer les données du forfait sélectionné
+        $.ajax({
+          url: "{% url 'get_collaborateur' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
+          data: {
+            collaborateur_id: selectedCollaborateur  // ID du forfait sélectionné à envoyer au serveur
+          },
+          dataType: "json",
+          success: function(data) {
+            if (data) {
+              nomField.val(data.nom);
+              prenomField.val(data.prenom);
+            } else {
+              nomField.val("");
+              prenomField.val("");
+            }
+          }
+        });
+      }
+      
+      // Écouteur d'événement pour la modification du champ "forfait"
+      var collaborateurField = $("#id_collaborateur");
+      collaborateurField.on("change", updatePlafondFields);
+    });
+  </script>
 {% endblock content %}
 

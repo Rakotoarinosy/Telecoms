@@ -1,0 +1,80 @@
+{% extends '../../../base_sim.html' %} 
+{% block titre1 %}Parametrage SIM{% endblock titre1 %}
+{% block titre2 %}Operateur{% endblock titre2 %}
+
+{% block menu_parametrage %}
+
+  <nav class="navbar navbar-expand-lg navbar-light  ">
+      <div class="container-fluid">
+          <a class="navbar-brand" href="#">Paramétrage</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'operateur' %}">Opérateur</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'acces_create_and_list' %}">Accès</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'forfait_create_and_list' %} ">Forfait</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'type_sim_create_and_list' %} ">Type de SIM</a>
+                </li>
+              </ul>
+          </div>
+      </div>
+  </nav>
+{% endblock menu_parametrage %}
+{% block content %}
+<section class="background-radial-gradient overflow-hidden">
+    <div class="container px-4 py-5 px-md-5 text-center text-lg-start my-5">
+        <div class="row gx-lg-5 align-items-center mb-5 ">
+          <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
+            <h1 class="text-center">Ajout d'un nouvel Opérateur</h1>
+            
+            <form class="card-body px-4 py-5 px-md-5" method="post">{% csrf_token %} 
+              {{ form.as_p }}
+              <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
+            </form>
+
+          </div>
+          
+          <div class="col-lg-6 mb-5 mb-lg-0 offset-1">
+            <div class="card-body ">
+              <table id="profil" class="table">
+                  <thead>
+                    <tr>
+                      <th>id</th>
+                      <th>Operateur</th>
+                      <th>Identifiant</th>
+                      <th>Modifier</th>
+                      <th>Supprimer</th>
+                    </tr>
+                  </thead>
+                  {% for operateur in operateurs %}
+                  <tbody>
+                    <tr>
+                      <td>{{operateur.id}}</td>
+                      <td >{{ operateur.libelle }}</td>
+                      <td>{{ operateur.identifiant }}</td>
+                      <td><a href="{% url 'update_operateur' pk=operateur.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+                      <td><a href="{% url 'delete_operateur' pk=operateur.pk %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
+                    </tr>
+                  </tbody>
+                  {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript" class="init">
+    $(document).ready(function() {
+        $('#profil').DataTable();
+    });
+</script>
+{% endblock content %}

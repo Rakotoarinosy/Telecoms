@@ -1,0 +1,34 @@
+{% extends '../../base_sim.html' %}
+{% block title %}Profil{% endblock %}
+
+{% block content %}
+<section class="background-radial-gradient overflow-hidden">
+    <div class="col-lg-6 mb-5 mb-lg-0 offset-1">
+        <div class="card-body">
+            <table id="profil" class=" table ">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Type de profil</th>
+                        <th>Etat</th>
+                    </tr>
+                </thead>
+                {% for profil in profils %}
+                <tbody>
+                    <tr>
+                        <td>{{ profil.id }}</td>
+                        <td>{{ profil.etat_id }}</td>
+                        <td>{{ profil.libelle }}</td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</section>
+<script type="text/javascript" class="init">
+    $(document).ready(function() {
+        $('#profil').DataTable();
+    });
+</script>
+{% endblock  %}

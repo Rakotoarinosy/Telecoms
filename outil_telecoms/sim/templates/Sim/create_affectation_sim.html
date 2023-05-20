@@ -5,7 +5,7 @@
 
 <div class="row mb-5 mt-5">
     <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
-        <h1 class="text-center">Ajout d'un nouvel d'opérateur</h1>
+        <h1 class="text-center">Affectation</h1>
             <form class="card-body px-4 py-5 px-md-5" method="post">{% csrf_token %} 
                 {{ form.as_p }}
                 <input class="btn btn-success mt-2" type="submit" style="background: #176F62;" value="Créer">
@@ -17,8 +17,8 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function() {
+<!--script>
+    /*$(document).ready(function() {
       // Fonction de mise à jour des champs
       function updatePlafondFields() {
         var collaborateurField = $("#id_collaborateur");
@@ -50,8 +50,78 @@
       // Écouteur d'événement pour la modification du champ "forfait"
       var collaborateurField = $("#id_collaborateur");
       collaborateurField.on("change", updatePlafondFields);
+    });*/
+    $(document).ready(function() {
+      // Fonction de mise à jour des champs
+      function updatePlafondFields() {
+        var collaborateurField = $("#id_collaborateur");
+        var nomField = $("#id_nom");
+        var prenomField = $("#id_prenom");
+        
+        var selectedCollaborateur = collaborateurField.val();
+        
+        // Requête AJAX pour récupérer les données du collaborateur sélectionné
+        $.ajax({
+          url: "{% url 'get_collaborateur' %}",  // L'URL de la vue Django qui renvoie les détails du collaborateur
+          data: {
+            collaborateur_id: selectedCollaborateur  // ID du collaborateur sélectionné à envoyer au serveur
+          },
+          dataType: "json",
+          success: function(data) {
+            if (data) {
+              nomField.val(data.nom);
+              prenomField.val(data.prenom);
+            } else {
+              nomField.val("");
+              prenomField.val("");
+            }
+          }
+        });
+      }
+      
+      // Écouteur d'événement pour la modification du champ "collaborateur"
+      var collaborateurField = $("#id_collaborateur");
+      collaborateurField.on("change", updatePlafondFields);
     });
-  </script>
+    
+
+</script-->
+
+<script>
+$(document).ready(function() {
+  // Fonction de mise à jour des champs
+  function updatePlafondFields() {
+    var collaborateurField = $("#id_collaborateur");
+    var nomField = $("#id_nom");
+    var prenomField = $("#id_prenom");
+    
+    var selectedCollaborateur = collaborateurField.val();
+    
+    // Requête AJAX pour récupérer les données du collaborateur sélectionné
+    $.ajax({
+      url: "{% url 'get_collaborateur' %}",  // L'URL de la vue Django qui renvoie les détails du collaborateur
+      data: {
+        collaborateur_id: selectedCollaborateur  // ID du collaborateur sélectionné à envoyer au serveur
+      },
+      dataType: "json",
+      success: function(data) {
+        if (data) {
+          nomField.val(data.nom);
+          prenomField.val(data.prenom);
+        } else {
+          nomField.val("");
+          prenomField.val("");
+        }
+      }
+    });
+  }
+  
+  // Écouteur d'événement pour la modification du champ "collaborateur"
+  var collaborateurField = $("#id_collaborateur");
+  collaborateurField.on("change", updatePlafondFields);
+});
+
+</script>
 
 {% endblock content %}
   

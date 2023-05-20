@@ -1,0 +1,74 @@
+{% extends '../../base_sim.html' %} 
+{% block titre1 %}Parametrage Gestion d'utilisateur{% endblock titre1 %}
+{% block titre2 %}Type de profil{% endblock titre2 %}
+
+{% block menu_parametrage %}
+
+  <nav class="navbar navbar-expand-lg navbar-light  ">
+      <div class="container-fluid">
+          <a class="navbar-brand" href="#">Parametrage</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Gestion vue</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link active" href="{% url 'profil_create_and_list' %}">Profil</a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </nav>
+{% endblock menu_parametrage %}
+{% block content %}
+<section class="background-radial-gradient overflow-hidden">
+    <div class="container px-4 py-5 px-md-5 text-center text-lg-start my-5">
+        <div class="row gx-lg-5 align-items-center mb-5 ">
+          <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
+            <h1 class="text-center">Ajout d'un profil</h1>
+            
+            <form class="card-body px-4 py-5 px-md-5" method="post">{% csrf_token %} 
+              {{ form.as_p }}
+              <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
+            </form>
+
+          </div>
+          
+          <div class="col-lg-6 mb-5 mb-lg-0 offset-1">
+            <div class="card-body ">
+              <table id="profil" class="table">
+                  <thead>
+                    <tr>
+                      <th>id</th>
+                      <th>Type de profil</th>
+                      <th>Etat</th>
+                      <th>Modifier</th>
+                      <th>Supprimer</th>
+                    </tr>
+                  </thead>
+                  {% for profil in profils %}
+                  <tbody>
+                    <tr>
+                      <td>{{profil.id}}</td>
+                      <td >{{ profil.libelle }}</td>
+                      <td>{{ profil.etat }}</td>
+                      <td><a href="{% url 'profil_update' pk=profil.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+                      <td><a href="{% url 'profil_delete' pk=profil.pk %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
+                    </tr>
+                  </tbody>
+                  {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript" class="init">
+    $(document).ready(function() {
+        $('#profil').DataTable();
+    });
+</script>
+{% endblock content %}

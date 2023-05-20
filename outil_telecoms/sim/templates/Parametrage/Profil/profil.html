@@ -1,0 +1,9 @@
+{% extends '../../base_sim' %}
+{% block title %}Profil{% endblock %}
+
+{% block content %}
+    <form method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <input class="form-control btn btn-success btn-block" type="submit" value="Save">
+    </form>
+{% endblock  %}

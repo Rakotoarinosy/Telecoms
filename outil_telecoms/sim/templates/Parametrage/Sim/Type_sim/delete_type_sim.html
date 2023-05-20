@@ -11,7 +11,7 @@
             <form method="post">
                 {% csrf_token %}
 
-                <button class="btn btn-outline-danger" type="submit">Supprimer</button>
+                <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Voulez-vous vraiment supprimer ce type de SIM ?')">Supprimer</button>
                 {% block redirect %}
                 <a class="btn btn-outline-secondary" href="{% url 'type_sim_create_and_list' %}">Annuler</a>
                 {% endblock redirect %}
