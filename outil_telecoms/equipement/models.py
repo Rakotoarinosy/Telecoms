@@ -1,3 +1,4 @@
+from logging import PlaceHolder
 from django.db import models
 
 from sim.models import Collaborateur, Etat, Sim, Ticket
@@ -8,7 +9,7 @@ class Bc(models.Model):
     date_bc = models.DateField(verbose_name="Date Bon de commande")
 
 class Categorie(models.Model):
-    libelle = models.CharField(max_length=60, verbose_name="Catégorie",default="TELECOM")
+    libelle = models.CharField(max_length=30, verbose_name="Catégorie",default="TELECOM")
 
 class Facture(models.Model):
     num_facture = models.CharField(max_length=60,verbose_name="Numéro facture")
@@ -26,12 +27,18 @@ class Code_analytique(models.Model):
     categorie = models.ForeignKey(Categorie,on_delete=models.SET_NULL,null=True)
 
 class Materiel(models.Model):
-    libelle = models.CharField(verbose_name="Matériel",max_length=50)
+    libelle = models.CharField(verbose_name="Type d'équipement",max_length=50)
     code_analytique = models.ForeignKey(Code_analytique,on_delete=models.SET_NULL,null=True)
+    
+    def __str__ (self):
+        return self.libelle
 
 class Article_modele(models.Model):
-    reference_modele = models.CharField(max_length=60, verbose_name="Article Modèle")
+    reference_modele = models.CharField(max_length=60, verbose_name="Modèle équipement")
     materiel = models.ForeignKey(Materiel,on_delete=models.SET_NULL,null=True)
+        
+    def __str__ (self):
+        return self.reference_modele
 
 class Article(models.Model):
     imei1 = models.IntegerField(verbose_name="IMEI 1")

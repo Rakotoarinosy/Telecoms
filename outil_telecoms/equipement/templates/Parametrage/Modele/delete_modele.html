@@ -1,0 +1,26 @@
+{% extends '../base_parametrage_equipement.html' %}
+
+{% block content %}
+<div class="container px-4 py-5 px-md-5 text-center text-lg-start my-5">
+    <div class="row gx-lg-5 align-items-center mb-5 ">
+        <div class="col-lg-5 mb-5 mb-lg-0" style="z-index: 10">
+            <h1>Supprimer le modèle</h1>
+
+            <p>Êtes-vous sûr de vouloir supprimer le modèle " <span class="border bg-light m-1">{{ modele.reference_modele }}</span> " ?</p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Voulez-vous vraiment supprimer ce modèle ?')">Supprimer</button>
+                {% block redirect %}
+                <a class="btn btn-outline-secondary" href="{% url 'modele' %}">Annuler</a>
+                {% endblock redirect %}
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock content %}
