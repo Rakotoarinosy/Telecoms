@@ -1,18 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
-from django.db import IntegrityError
-from django.views.generic.edit import CreateView,FormView
+from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import DeleteView
+from django.views.generic import TemplateView
 from django.views.generic import ListView
 from django.http import JsonResponse
-from django.views import View
 from sim.models import *
 
-from sim.forms import AccesForm, AffectationSimForm, CombinedCompletForm, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm,TicketForm, Type_SimForm
+from sim.forms import AccesForm, AffectationSimForm, CombinedCompletForm, CombinedFormTest, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Ticket_creat_simForm,TicketForm, Type_SimForm
 
 from django.contrib.auth import logout
-from django.shortcuts import redirect
 # Accueil
 def logout_view(request):
     logout(request)
@@ -33,7 +31,7 @@ def parametrage(request):
 class ProfilCreateView(FormView):
     form_class = ProfilForm
     template_name = 'Parametrage/Gestion_utilisateur/Profil/create_profil.html'
-    success_url = reverse_lazy('create_profil')
+    success_url = reverse_lazy('profil')
 
     def form_valid(self, form):
         form.save()
@@ -52,22 +50,30 @@ class ProfilListView(ListView):
 class ProfilDeleteView(DeleteView):
     model = Profil
     template_name = 'Parametrage/Gestion_utilisateur/Profil/delete_profil.html'
-    success_url = reverse_lazy('create_profil')
+    success_url = reverse_lazy('profil')
     
 class ProfilUpdateView(UpdateView):
     model = Profil
     form_class = ProfilUpdateForm
     template_name = 'Parametrage/Gestion_utilisateur/Profil/update_profil.html'
-    success_url = reverse_lazy('create_profil')
+    success_url = reverse_lazy('profil')
     
     def get_queryset(self):
         return Profil.objects.all()
+
+class ProfilView(TemplateView):
+    template_name = 'Parametrage/Gestion_utilisateur/Profil/profil.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profils'] = Profil.objects.all()
+        context['form'] = ProfilForm()
+        return context
     
 ###OPERATEUR
 class OperateurCreateView(FormView):
     form_class = OperateurForm
     template_name = 'Parametrage/Sim/Operateur/create_operateur.html'
-    success_url = reverse_lazy('list_operateur')
+    success_url = reverse_lazy('operateur')
 
     def form_valid(self, form):
         form.save()
@@ -82,20 +88,29 @@ class OperateurListView(ListView):
     model = Operateur
     template_name = 'Parametrage/Sim/Operateur/list_operateur.html'
     context_object_name = 'operateurs'
+
        
 class OperateurDeleteView(DeleteView):
     model = Operateur
     template_name = 'Parametrage/Sim/Operateur/delete_operateur.html'
-    success_url = reverse_lazy('list_operateur')
+    success_url = reverse_lazy('operateur')
     
 class OperateurUpdateView(UpdateView):
     model = Operateur
     form_class = OperateurForm
     template_name = 'Parametrage/Sim/Operateur/update_operateur.html'
-    success_url = reverse_lazy('list_operateur')
+    success_url = reverse_lazy('operateur')
     
     def get_queryset(self):
         return Operateur.objects.all()
+
+class OperateurView(TemplateView):
+    template_name = 'Parametrage/Sim/Operateur/operateur.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['operateurs'] = Operateur.objects.all()
+        context['form'] = OperateurForm()
+        return context
 
 ###ACCESS
 class AccesCreateView(FormView):
@@ -131,6 +146,14 @@ class AccesUpdateView(UpdateView):
     def get_queryset(self):
         return Acces_sim.objects.all()
 
+class AccesView(TemplateView):
+    template_name = 'Parametrage/Sim/Acces/acces.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['access'] = Acces_sim.objects.all()
+        context['form'] = AccesForm()
+        return context
+
 ###TYPE_SIM
 class Type_SimCreateView(FormView):
     form_class = Type_SimForm
@@ -164,6 +187,14 @@ class Type_SimUpdateView(UpdateView):
     
     def get_queryset(self):
         return Type_sim.objects.all()
+
+class Type_SimView(TemplateView):
+    template_name = 'Parametrage/Sim/Type_sim/type_sim.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['type_sims'] = Type_sim.objects.all()
+        context['form'] = Type_SimForm()
+        return context
     
 ###FORFAIT
 class ForfaitCreateView(FormView):
@@ -198,6 +229,14 @@ class ForfaitUpdateView(UpdateView):
     
     def get_queryset(self):
         return Forfait.objects.all()
+
+class ForfaitView(TemplateView):
+    template_name = 'Parametrage/Sim/Forfait/forfait.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['forfaits'] = Forfait.objects.all()
+        context['form'] = ForfaitForm()
+        return context
 
 #SIM
 ##Affectation SIM
@@ -279,22 +318,22 @@ def get_forfait(request):
 #     return render(request, 'Sim/combined.html', {'form': form})
 
 class TicketCreateView(FormView):
-    template_name = 'Sim/create_ticket.html'
+    template_name = 'Sim/Ticket_create_sim.html'
+    form_class = TicketForm
+    success_url = reverse_lazy('ticketForm')  # URL de redirection en cas de succès
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+class Ticket_creat_sim(FormView):
+    template_name = 'Sim/Ticket_create_sim.html'
     form_class = TicketForm
     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
 
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-    
-# class Ticket_creat_sim(FormView):
-#     template_name = 'Sim/Ticket_creat_sim.html'
-#     form_class = Ticket_creat_simForm
-#     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
-
-#     def form_valid(self, form):
-#         form.save()
-#         return super().form_valid(form)
     
 # class CombinedFormView(FormView):
 #     template_name = 'Sim/combined.html'
@@ -308,6 +347,15 @@ class TicketCreateView(FormView):
 class CombinedFormView1(FormView):
     template_name = 'Sim/combined1.html'
     form_class = CombinedCompletForm
+    success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+class CombinedTest(FormView):
+    template_name = 'Sim/combined.html'
+    form_class = CombinedFormTest
     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
 
     def form_valid(self, form):

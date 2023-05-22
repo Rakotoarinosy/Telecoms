@@ -3,9 +3,11 @@ from dataclasses import fields
 from multiprocessing import context
 from os import access
 from pyexpat import model
+from urllib import request
 from django import forms
 from .models import *
-
+from unidecode import unidecode
+from django.shortcuts import render,redirect
 
 class ProfilForm(forms.ModelForm):
     etat = forms.ModelChoiceField(queryset=Etat.objects.all(), initial=Etat.objects.get(libelle='Actif'), widget=forms.HiddenInput())    
@@ -36,7 +38,6 @@ class ProfilUpdateForm(forms.ModelForm):
         if existing_profil:
             raise forms.ValidationError("Ce type de profil existe déjà.")
         return cleaned_libelle
-        
         
 class OperateurForm(forms.ModelForm):
     class Meta:
@@ -128,7 +129,6 @@ class ForfaitFormUpdate(forms.ModelForm):
             raise forms.ValidationError("Ce type de forfait existe déjà.")
         return cleaned_libelle
     
-    
 class SimForm(forms.ModelForm):
     forfait = forms.ModelChoiceField(queryset=Forfait.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
     
@@ -175,8 +175,7 @@ class TicketForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['numero'].label = "Numéro Ticket"
-
-            
+       
 class AffectationSimForm(forms.ModelForm):
     collaborateur = forms.ModelChoiceField(queryset=Collaborateur.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
     class Meta:
@@ -199,7 +198,6 @@ class AffectationSimForm(forms.ModelForm):
             self.fields['prenom'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled'}))     
         
 class CombinedCompletForm(forms.Form):
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -215,40 +213,75 @@ class CombinedCompletForm(forms.Form):
     # def save(self):
     #     # Ajoutez ici votre logique d'enregistrement personnalisée si nécessaire
     #     pass   
+    
+    # def save(self):
+    #     ticket_data = self.cleaned_data.get('ticket')
+    #     sim_data = self.cleaned_data.get('sim')
+    #     affectation_sim_data = self.cleaned_data.get('affectation_sim')
+
+    #     # Créer l'objet Ticket avec les données de ticket_data
+    #     ticket = Ticket.objects.create(**ticket_data)
+
+    #     # Créer l'objet Sim avec les données de sim_data
+    #     sim = Sim.objects.create(**sim_data)
+
+    #     # Créer l'objet Affectation_sim avec les données de affectation_sim_data
+    #     affectation_sim = Affectation_sim.objects.create(**affectation_sim_data)
+
+    #     # Effectuer les associations ForeignKey nécessaires
+    #     affectation_sim.ticket = ticket
+    #     affectation_sim.sim = sim
+    #     affectation_sim.save()
+    
     def save(self):
         ticket_data = self.cleaned_data.get('ticket')
         sim_data = self.cleaned_data.get('sim')
         affectation_sim_data = self.cleaned_data.get('affectation_sim')
+
+        # Créez l'objet Ticket avec les données de ticket_data
+        ticket = Ticket.objects.create(**ticket_data)
+
+        # Créez l'objet Sim avec les données de sim_data
+        sim = Sim.objects.create(**sim_data)
+
+        # Créez l'objet Affectation_sim avec les données de affectation_sim_data
+        affectation_sim = Affectation_sim.objects.create(**affectation_sim_data)
+
+        # Effectuez les associations ForeignKey nécessaires
+        affectation_sim.ticket = ticket
+        affectation_sim.sim = sim
+        affectation_sim.save()
+        
+        form = CombinedCompletForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Autres actions à effectuer en cas de succès
+        else:
+            # Gérer les erreurs de validation du formulaire
+            return ('erreue d\'envoi')
+
+
+
+class Ticket_creat_simForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields.update(TicketForm().fields)
+        self.fields.update(SimForm().fields)
+    def clean(self):
+        cleaned_data = super().clean()
+        # Ajoutez ici votre logique de validation personnalisée si nécessaire
+        return cleaned_data
+    
+    def save(self):
+        ticket_data = self.cleaned_data.get('ticket')
+        sim_data = self.cleaned_data.get('sim')
 
         # Créer l'objet Ticket avec les données de ticket_data
         ticket = Ticket.objects.create(**ticket_data)
 
         # Créer l'objet Sim avec les données de sim_data
         sim = Sim.objects.create(**sim_data)
-
-        # Créer l'objet Affectation_sim avec les données de affectation_sim_data
-        affectation_sim = Affectation_sim.objects.create(**affectation_sim_data)
-
-        # Effectuer les associations ForeignKey nécessaires
-        affectation_sim.ticket = ticket
-        affectation_sim.sim = sim
-        affectation_sim.save()
-
-# class Ticket_creat_simForm(forms.Form):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-        
-#         self.fields.update(TicketForm().fields)
-#         self.fields.update(SimForm().fields)
-
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         # Ajoutez ici votre logique de validation personnalisée si nécessaire
-#         return cleaned_data
-
-#     def save(self):
-#         # Ajoutez ici votre logique d'enregistrement personnalisée si nécessaire
-#         pass   
     
 # class CombinedForm(forms.Form):
 #     def __init__(self, *args, **kwargs):
@@ -273,4 +306,50 @@ class CombinedCompletForm(forms.Form):
 #         # Effectuez les associations ForeignKey nécessaires
 #         sim.ticket = ticket
 #         sim.save()
-    
+
+
+class CombinedFormTest(forms.ModelForm):
+    numero = forms.IntegerField(label="Numéro Téléphone", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    adresseIP = forms.CharField(label="Adresse IP", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    operateur = forms.ModelChoiceField(queryset=Operateur.objects.all(), label="Opérateur", widget=forms.Select(attrs={'class': 'form-control'}))
+    acces = forms.ModelChoiceField(queryset=Acces_sim.objects.all(), label="Accès", widget=forms.Select(attrs={'class': 'form-control'}))
+    etat = forms.ModelChoiceField(queryset=Etat.objects.all(), label="Etat", widget=forms.Select(attrs={'class': 'form-control'}))
+    forfait = forms.ModelChoiceField(queryset=Forfait.objects.all(), label="Forfait", widget=forms.Select(attrs={'class': 'form-control'}))
+    dateDemande = forms.DateField(label="Date de demande", widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    dateApprobation = forms.DateField(label="Date d'approbation", widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    compte_facturation = forms.ModelChoiceField(queryset=Compte_facturation.objects.all(), label="Compte de Facturation", widget=forms.Select(attrs={'class': 'form-control'}))
+    numero_ticket = forms.CharField(label="Numéro Ticket", widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Sim
+        fields = ['numero', 'adresseIP', 'operateur', 'acces', 'etat', 'forfait', 'numero_ticket' ,'dateDemande', 'dateApprobation', 'compte_facturation']
+
+    def save_combined_form(request):
+        if request.method == 'POST':
+            form = CombinedFormTest(request.POST)
+            if form.is_valid():
+                sim = form.save(commit=False)  # Obtient une instance de Sim à partir du formulaire sans enregistrer immédiatement
+                ticket = Ticket()  # Instancie un nouvel objet Ticket
+                
+                # Récupère les données du formulaire
+                numero_ticket = form.cleaned_data['numero_ticket']
+                
+                # Associe les valeurs aux champs du modèle Ticket
+                ticket.numero = numero_ticket
+                # Associez d'autres valeurs de champs de Ticket si nécessaire
+                
+                # Enregistre les instances de Sim et Ticket dans la base de données
+                sim.save()
+                ticket.save()
+                
+                # Effectue d'autres actions nécessaires ou redirige vers une autre page
+                
+                return redirect('nom_de_la_vue')  # Redirection vers une autre vue après la sauvegarde
+        else:
+            form = CombinedFormTest()
+        
+        context = {
+            'form': form
+        }
+        
+        return render(request, 'template.html', context)
