@@ -4,8 +4,6 @@
 
 {% block content %}
 <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
-  <a class="btn btn-primary mt-5 mb-5" href="{% url 'operateur' %}" >Retour</a>
-
     <h1 class="text-center">Ajout d'un nouvel d'opérateur</h1>
         <form class="card-body px-4 py-5 px-md-5" action="{% url 'create_operateur' %}" method="post">{% csrf_token %}          
           {{ form.as_p }}
@@ -24,4 +22,31 @@
           <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
         </form>
   </div>
+     
+  <div class="col-lg-6 mb-5 mb-lg-0 offset-1 ">
+    <div class="card-body ">
+      <table id="profil" class="table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>Opérateur</th>
+              <th>Identifiant</th>
+              <th>Modifier</th>
+              <th>Supprimer</th>
+            </tr>
+          </thead>
+          {% for operateur in operateurs %}
+          <tbody>
+            <tr>
+              <td>{{ operateur.id }}</td>
+              <td>{{ operateur.libelle }}</td>
+              <td>{{ operateur.identifiant }}</td>
+              <td><a href="{% url 'update_operateur' pk=operateur.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+              <td><a href="{% url 'delete_operateur' pk=operateur.pk %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+      </table>
+    </div>
+  </div> 
 {% endblock content %}

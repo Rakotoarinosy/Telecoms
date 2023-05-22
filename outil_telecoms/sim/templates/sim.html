@@ -3,19 +3,19 @@
     <div class="row center-block">
         <div class="row align-items-center mb-5">
             <h1>
-                <center>OUTIL DE SUIVI DE MATERIELS ET DE LIGNES DE TELECOMMUNICATION</center>
+                <center class="text-uppercase">OUTIL DE SUIVI DE MATERIELS ET DE LIGNES DE TELECOMMUNICATION</center>
             </h1>
         </div>
         <div class="row">
             <h1>
-                <center>{% block option %}SIM{% endblock option %}</center>
+                <center class="text-uppercase">{% block option %}SIM{% endblock option %}</center>
             </h1>
         </div>
         <div class="row mt-5 mb-5">
             {% block sous_menu %}
                 <div class="col"></div>
                 <div class="col">
-                    <a href="#">
+                    <a href="{% url 'complet' %}">
                         <h1 class="btn btn-success form-control" style="background: #176F62;">AFFECTATION SIM</h1>
                     </a>
                 </div>

@@ -5,6 +5,7 @@
 {% block content %}
 
   <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
+    <a class="btn btn-primary mt-5 mb-5" href="{% url 'profil' %}" >Retour</a>
     <h1 class="text-center">Ajout d'un nouveau profil</h1>
         <form class="card-body px-4 py-5 px-md-5" method="post">{% csrf_token %}          
           {{ form.as_p }}
@@ -23,8 +24,4 @@
           <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
         </form>
   </div>
-  
-  <div class="col-lg-5 mb-5 mb-lg-0 offset-1" style="z-index: 10">
-    <a class="btn btn-success" href="{% url 'list_profil' %}" style="background: #176F62;">Voir la liste de profil</a>
-</div>
 {% endblock content %}
