@@ -19,6 +19,7 @@
             </ul>
           </div>
         {% endif %}
+        
         <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
       </form>
   </div>
@@ -29,7 +30,8 @@
           <thead>
             <tr>
               <th>id</th>
-              <th>Type de SIM</th>
+              <th>Modèle et Référence</th>
+              <th>Type d'équipement</th>
               <th>Modifier</th>
               <th>Supprimer</th>
             </tr>
@@ -39,6 +41,7 @@
             <tr>
               <td>{{modele.id}}</td>
               <td >{{ modele.reference_modele }}</td>
+              <td >{{ modele.materiel }}</td>
               <td><a href="{% url 'update_modele' pk=modele.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
               <td><a href="{% url 'delete_modele' pk=modele.pk %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
             </tr>

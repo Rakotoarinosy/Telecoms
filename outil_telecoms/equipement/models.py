@@ -17,14 +17,20 @@ class Facture(models.Model):
 
 class Emplacement(models.Model):
     libelle = models.CharField(verbose_name="Emplacement",max_length=50)
+    def __str__(self):
+        return self.libelle
     
 class Emplacement_article (models.Model):
     emplacement = models.ForeignKey(Emplacement,on_delete=models.SET_NULL,null=True )
+    def __str__(self):
+        return self.emplacement
        
 
 class Code_analytique(models.Model):
     libelle = models.CharField(verbose_name="Code Analytique",max_length=50)
     categorie = models.ForeignKey(Categorie,on_delete=models.SET_NULL,null=True)
+    def __str__(self):
+        return self.libelle
 
 class Materiel(models.Model):
     libelle = models.CharField(verbose_name="Type d'équipement",max_length=50)

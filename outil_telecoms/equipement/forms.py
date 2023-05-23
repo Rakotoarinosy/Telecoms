@@ -16,22 +16,24 @@ class TypeEquipementForm(forms.ModelForm):
         }
     def clean_libelle(self):
         cleaned_libelle = unidecode(self.cleaned_data.get('libelle', ''))
+        print("voafafa")
         existing_typeEquipement = Materiel.objects.filter(libelle__iexact=cleaned_libelle).exclude(id=self.instance.id).exists()
         if existing_typeEquipement:
             raise forms.ValidationError("Ce type d'équipement existe déjà.")
         return cleaned_libelle
 
 class ModeleForm(forms.ModelForm):   
+    materiel = forms.ModelChoiceField(queryset=Materiel.objects.all(), initial=Materiel.objects.get(libelle='Smartphone'), widget=forms.Select(attrs={'class': 'form-select'}))    
     class Meta:
         model = Article_modele
         fields = "__all__"
         widgets = {
             'reference_modele': forms.TextInput(attrs={'class': 'form-control'}),
-            'materiel': forms.Select(attrs={'class': 'form-select'}),
         }
-    def clean_libelle(self):
+    def clean_reference_modele(self):
         cleaned_reference_modele = unidecode(self.cleaned_data.get('reference_modele', ''))  # Supprimer les accents du libellé
-        existing_modele = Article_modele.objects.filter(libelle__iexact=cleaned_reference_modele).exclude(id=self.instance.id).exists()
+        print("manandrana mamafa")
+        existing_modele = Article_modele.objects.filter(reference_modele__iexact=cleaned_reference_modele).exclude(id=self.instance.id).exists()
         if existing_modele:
             raise forms.ValidationError("Ce type de Modèle existe déjà.")
         return cleaned_reference_modele
