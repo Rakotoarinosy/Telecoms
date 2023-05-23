@@ -121,8 +121,8 @@ class Sim(models.Model):
 class Affectation_sim(models.Model):
     dateAffectation = models.DateField(auto_now=True,verbose_name="Date d'affectation")
     dateActivation = models.DateField(auto_now=True,verbose_name="Date d'activation")
-    dateDesactivation = models.DateField(auto_now=True,verbose_name="Date de désactivation")
-    dateModification = models.DateField(auto_now=True,verbose_name="Date de modification")
+    dateDesactivation = models.DateField(verbose_name="Date de désactivation",blank=True,null=True)
+    dateModification = models.DateField(verbose_name="Date de modification",blank=True,null=True)
     ticket = models.ForeignKey(Ticket,on_delete=models.SET_NULL,null=True,verbose_name="Numéro Ticket")
     sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True,verbose_name="Numéro")
     collaborateur = models.ForeignKey(Collaborateur,on_delete=models.SET_NULL,null=True,verbose_name="Collaborateur")

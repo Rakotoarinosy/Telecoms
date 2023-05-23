@@ -38,6 +38,7 @@ class ProfilUpdateForm(forms.ModelForm):
         if existing_profil:
             raise forms.ValidationError("Ce type de profil existe déjà.")
         return cleaned_libelle
+    
         
 class OperateurForm(forms.ModelForm):
     class Meta:
@@ -196,6 +197,19 @@ class AffectationSimForm(forms.ModelForm):
         else:
             self.fields['nom'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
             self.fields['prenom'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled'}))     
+        
+class Affectation_simFormUpdate(forms.ModelForm):
+    class Meta:
+        model = Affectation_sim
+        fields = "__all__"
+        widgets = {
+            'dateDesactivation': forms.DateInput(attrs={'class': 'form-control','type': 'date'}),
+            'dateModification': forms.DateInput(attrs={'class': 'form-control','type': 'date'}),
+            'libelle': forms.TextInput(attrs={'class': 'form-control'}),
+            'collaborateur': forms.Select(attrs={'class': 'form-select'}),
+            'ticket': forms.Select(attrs={'class': 'form-control'}),
+            'sim': forms.Select(attrs={'class': 'form-control'}),
+        }
         
 class CombinedCompletForm(forms.Form):
     def __init__(self, *args, **kwargs):

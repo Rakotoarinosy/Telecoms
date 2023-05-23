@@ -8,7 +8,7 @@ from django.views.generic import ListView
 from django.http import JsonResponse
 from sim.models import *
 
-from sim.forms import AccesForm, AffectationSimForm, CombinedCompletForm, CombinedFormTest, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Ticket_creat_simForm,TicketForm, Type_SimForm
+from sim.forms import AccesForm, Affectation_simFormUpdate, AffectationSimForm, CombinedCompletForm, CombinedFormTest, ForfaitForm, ForfaitFormUpdate,OperateurForm, ProfilForm, ProfilUpdateForm, SimForm, Ticket_creat_simForm,TicketForm, Type_SimForm
 
 from django.contrib.auth import logout
 # Accueil
@@ -268,12 +268,23 @@ def get_collaborateur(request):
         return JsonResponse(data)
     except Collaborateur.DoesNotExist:
         return JsonResponse({'error': 'Collaborateur introuvable'})
+
     
+#List_affecation   
 class AffectationSimListView(ListView):
     model = Affectation_sim
     template_name = 'Sim/list_affectation_sim.html'
     context_object_name = 'affectationSims'
-
+    
+#Update_affecation   
+class AffectationSimUpdateView(UpdateView):
+    model = Affectation_sim
+    form_class = Affectation_simFormUpdate
+    template_name = 'Sim/update_list_affectation_sim.html'
+    success_url = reverse_lazy('list_affectation_sim')
+    
+    def get_queryset(self):
+        return Forfait.objects.all()
     
 class SimCreateView(FormView):
     form_class = SimForm
@@ -306,16 +317,6 @@ def get_forfait(request):
     except Forfait.DoesNotExist:
         return JsonResponse({'error': 'Forfait introuvable'})
     
-# def combined_form_view(request):
-#     if request.method == 'POST':
-#         form = CombinedForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             # Redirigez vers une autre page ou affichez un message de succès
-#     else:
-#         form = CombinedForm()
-    
-#     return render(request, 'Sim/combined.html', {'form': form})
 
 class TicketCreateView(FormView):
     template_name = 'Sim/Ticket_create_sim.html'
@@ -335,15 +336,6 @@ class Ticket_creat_sim(FormView):
         form.save()
         return super().form_valid(form)
     
-# class CombinedFormView(FormView):
-#     template_name = 'Sim/combined.html'
-#     form_class = CombinedForm
-#     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
-
-#     def form_valid(self, form):
-#         form.save()
-#         return super().form_valid(form)
-    
 class CombinedFormView1(FormView):
     template_name = 'Sim/combined1.html'
     form_class = CombinedCompletForm
@@ -361,6 +353,29 @@ class CombinedTest(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+    
+
+# def combined_form_view(request):
+#     if request.method == 'POST':
+#         form = CombinedForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             # Redirigez vers une autre page ou affichez un message de succès
+#     else:
+#         form = CombinedForm()
+    
+#     return render(request, 'Sim/combined.html', {'form': form})
+
+# class CombinedFormView(FormView):
+#     template_name = 'Sim/combined.html'
+#     form_class = CombinedForm
+#     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
+
+#     def form_valid(self, form):
+#         form.save()
+#         return super().form_valid(form)
+    
     
 # def CombinedFormView1(request):
 #     if request.method == 'POST':
