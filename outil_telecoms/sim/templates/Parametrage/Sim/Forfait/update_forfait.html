@@ -8,7 +8,7 @@
             <form method="post">
                 {% csrf_token %} {{ form.as_p }}
                 <button class="btn btn-success" type="submit" style="background: #176F62;">Enregistrer</button>
-                <a class="btn btn-outline-secondary" href="{% url 'list_forfait' %}">Annuler</a>
+                <a class="btn btn-outline-secondary" href="{% url 'forfait' %}">Annuler</a>
             </form>
 
         </div>

@@ -1,1 +1,51 @@
 {% extends '../base_sim.html' %}
+{% block titre1 %}LISTE DES SIM{% endblock titre1 %}
+{% block content %}
+<div class="table-container">
+      <table id="profil" class="table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>Matricule</th>
+              <th>Nom</th>
+              <th>Prénom(s)</th>
+              <th>Ticket</th>
+              <th>Date d'affectation</th>
+              <th>Date d'activation</th>
+              <th>Date de Desactivation</th>
+              <th>Date de Modification</th>
+              <th>Opérateur</th>
+              <th>Forfait</th>
+              <th>Numéro</th>
+              <th>Adresse IP</th>
+              <th>Modifier</th>
+            </tr>
+          </thead>
+          {% for affectationSim in affectationSims %}
+          <tbody>
+            <tr>
+              <td>{{ affectationSim.id }}</td>
+              <td>{{ affectationSim.collaborateur.matricule}}</td>
+              <td>{{ affectationSim.collaborateur.nom}}</td>
+              <td>{{ affectationSim.collaborateur.prenom}}</td>
+              <td>{{ affectationSim.ticket.numero}}</td>
+              <td>{{ affectationSim.dateAffectation }}</td>
+              <td>{{ affectationSim.dateActivation }}</td>
+              <td>{{ affectationSim.dateDesactivation }}</td>
+              <td>{{ affectationSim.dateModification }}</td>
+              <td>{{ affectationSim.sim.operateur.libelle }}</td>
+              <td>{{ affectationSim.sim.forfait.libelle}}</td>
+              <td>{{ affectationSim.sim.numero }}</td>
+              <td>{{ affectationSim.sim.adresseIP }}</td>
+              <td><a href="{% url 'update_affectation_sim' pk=affectationSim.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+      </table>
+</div>
+<script type="text/javascript" class="init">
+  $(document).ready(function() {
+      $('#profil').DataTable();
+  });
+</script>
+{% endblock content %}
