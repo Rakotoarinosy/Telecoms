@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'create_stock' %}">
+    {% csrf_token %}
+    {{ bc_stock_form.as_p }}
+    <button type="submit">Enregistrer</button>
+  </form>

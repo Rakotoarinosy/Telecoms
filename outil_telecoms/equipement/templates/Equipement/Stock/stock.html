@@ -1,0 +1,53 @@
+{% extends '../../Parametrage/base_parametrage_equipement.html' %} 
+{% block titre1 %}Stock équipement{% endblock titre1 %}
+{% block content %}
+<div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
+    <h1 class="text-center">Ajout d'un nouvel stock</h1>
+        <form class="card-body px-4 py-5 px-md-5" action="{% url 'create_stock' %}" method="post">{% csrf_token %}          
+          {{ form.as_p }}
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              <strong>Erreurs :</strong>
+              <ul>
+                {% for field_errors in form.errors.values %}
+                  {% for error in field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
+        </form>
+</div>
+     
+  <div class="col-lg-6 mb-5 mb-lg-0  ">
+    <div class="card-body ">
+      <table id="profil" class="table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>quantite</th>
+              <th>pu_ht</th>
+              <th>prix global</th>
+              <th>Modifier</th>
+              <th>Supprimer</th>
+            </tr>
+          </thead>
+          {% for stock in stocks %}
+          <tbody>
+            <tr>
+              <td>{{ stock.id }}</td>
+              <td>{{ stock.quantite  }}</td>
+              <td>{{ stock.pu_ht  }}</td>
+              <td>{{ stock.prix_global  }}</td>
+              <td><a href="{% url 'update_stock' pk=stock.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+              <td><a href="{% url 'delete_stock' pk=stock.pk %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+      </table>
+    </div>
+  </div> 
+
+{% endblock content %}

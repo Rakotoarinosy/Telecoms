@@ -1,0 +1,51 @@
+{% extends '../../Parametrage/base_parametrage_equipement.html' %} 
+{% block titre1 %}Stock équipement{% endblock titre1 %}
+{% block content %}
+<div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
+    <h1 class="text-center">Ajout d'un nouvel bon de commande</h1>
+        <form class="card-body px-4 py-5 px-md-5" action="{% url 'create_bc' %}" method="post">{% csrf_token %}          
+          {{ form.as_p }}
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              <strong>Erreurs :</strong>
+              <ul>
+                {% for field_errors in form.errors.values %}
+                  {% for error in field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
+        </form>
+</div>
+     
+  <div class="col-lg-6 mb-5 mb-lg-0  ">
+    <div class="card-body ">
+      <table id="profil" class="table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>bc</th>
+              <th>Date BC</th>
+              <th>Modifier</th>
+              <th>Supprimer</th>
+            </tr>
+          </thead>
+          {% for bc in bcs %}
+          <tbody>
+            <tr>
+              <td>{{ bc.id }}</td>
+              <td>{{ bc.reference_bc }}</td>
+              <td>{{ bc.date_bc }}</td>
+              <td><a href="{% url 'update_bc' pk=bc.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+              <td><a href="{% url 'delete_bc' pk=bc.pk %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+      </table>
+    </div>
+  </div> 
+
+{% endblock content %}

@@ -1,18 +1,63 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import DeleteView
 from django.views.generic import TemplateView
 from django.views.generic import ListView
+from django.views import View 
+from .forms import BcStockForm
+from .models import Reception_article
 
-from equipement.forms import ModeleForm, TypeEquipementForm
-from equipement.models import Article_modele, Materiel
+from equipement.forms import BcForm, ModeleForm, StockForm, TypeEquipementForm
+from equipement.models import Article_modele, Bc, Materiel, Reception_article
 # Create your views here.
 
 def equipement(request):
     return render(request,'equipement.html')
 
+#BC
+class BcCreateView(FormView):
+    form_class = BcForm
+    template_name = 'Equipement/Bc/create_bc.html'
+    success_url = reverse_lazy('bc')
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        return context
+    
+# class BcListView(ListView):
+#     model = Bc
+#     template_name = 'Equipement/Bc/bc.html'
+#     context_object_name = 'operateurs'
+
+       
+class BcDeleteView(DeleteView):
+    model = Bc
+    template_name = 'Equipement/Bc/delete_bc.html'
+    success_url = reverse_lazy('bc')
+    
+class BcUpdateView(UpdateView):
+    model = Bc
+    form_class = BcForm
+    template_name = 'Equipement/Bc/update_bc.html'
+    success_url = reverse_lazy('bc')
+    
+    def get_queryset(self):
+        return Bc.objects.all()
+
+class BcView(TemplateView):
+    template_name = 'Equipement/Bc/bc.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bcs'] = Bc.objects.all()
+        context['form'] = BcForm()
+        return context
 #PARAMETRAGE
 ##paramètrage équipement
 ###EQUIPEMENT
@@ -88,3 +133,62 @@ class ModeleView(TemplateView):
         context['modeles'] = Article_modele.objects.all()
         context['form'] = ModeleForm()
         return context
+#Stock  
+class Reception_articleCreateView(FormView):
+    form_class = StockForm
+    template_name = 'Equipement/Stock/create_stock.html'
+    success_url = reverse_lazy('stock')
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        return context
+    
+class Reception_articleListView(ListView):
+    model = Reception_article
+    template_name = 'Equipement/Stock/list_stock.html'
+    context_object_name = 'stocks'
+    
+class Reception_articleDeleteView(DeleteView):
+    model = Reception_article
+    template_name = 'Equipement/Stock/delete_stock.html'
+    success_url = reverse_lazy('stock')
+    
+class Reception_articleUpdateView(UpdateView):
+    model = Reception_article
+    form_class = StockForm
+    template_name = 'Equipement/Stock/update_stock.html'
+    success_url = reverse_lazy('stock')
+    
+    def get_queryset(self):
+        return Reception_article.objects.all()
+
+class Reception_articleView(TemplateView):
+    template_name = 'Equipement/Stock/stock.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['stocks'] = Reception_article.objects.all()
+        context['form'] = StockForm()
+        return context
+    
+class CreateStockView(View):
+    bc_stock_form_class = BcStockForm
+    template_name = 'Equipement/Stock/votre_template.html'
+    success_url = 'stock'
+
+    def get(self, request):
+        bc_stock_form = self.bc_stock_form_class()
+        return render(request, self.template_name, {'bc_stock_form': bc_stock_form})
+
+    def post(self, request):
+        bc_stock_form = self.bc_stock_form_class(request.POST)
+        
+        if bc_stock_form.is_valid():
+            bc_stock_form.save()
+            return redirect(self.success_url)
+
+        return render(request, self.template_name, {'bc_stock_form': bc_stock_form})
