@@ -52,7 +52,8 @@ urlpatterns = [
     path('type_sim/<int:pk>/delete/', Type_SimDeleteView.as_view(), name='delete_type_sim'),
     
     #test
-    
+    path('my_view/', MyFormView.as_view(),name='my_view'),
+     
     # path('list_affectation_sim/',AffectationSimListView.as_view(),name='list_affectation_sim'),
     path('test/',CombinedTest.as_view(),name='test'),
 

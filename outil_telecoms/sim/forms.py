@@ -168,14 +168,14 @@ class TicketForm(forms.ModelForm):
         model = Ticket
         fields = "__all__"
         widgets = {
-            'numero': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_ticket': forms.TextInput(attrs={'class': 'form-control'}),
             'dateDemande': forms.DateInput(attrs={'class': 'form-control','type': 'date'}),
             'dateApprobation': forms.DateInput(attrs={'class': 'form-control','type': 'date'}),
             'compte_facturation': forms.Select(attrs={'class': 'form-control'}),
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['numero'].label = "Numéro Ticket"
+        self.fields['numero_ticket'].label = "Numéro Ticket"
        
 class AffectationSimForm(forms.ModelForm):
     collaborateur = forms.ModelChoiceField(queryset=Collaborateur.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
@@ -367,3 +367,5 @@ class CombinedFormTest(forms.ModelForm):
         }
         
         return render(request, 'template.html', context)
+    
+    

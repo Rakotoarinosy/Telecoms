@@ -12,13 +12,13 @@ class Compte_facturation(models.Model):
         return self.libelle
 
 class Ticket(models.Model):
-    numero = models.CharField(max_length=50,verbose_name="Numéro ticket",)
+    numero_ticket = models.CharField(max_length=50,verbose_name="Numéro ticket",)
     dateDemande = models.DateField(verbose_name="Date de demande")
     dateApprobation = models.DateField(verbose_name="Date d'approbation")
     compte_facturation = models.ForeignKey(Compte_facturation,on_delete=models.SET_NULL, null=True,verbose_name="Compte de Facturation")
 
     def __str__(self):
-        return str(self.numero)
+        return str(self.numero_ticket)
     
 class Division(models.Model):
     libelle = models.CharField(max_length=10,verbose_name="Division",)
