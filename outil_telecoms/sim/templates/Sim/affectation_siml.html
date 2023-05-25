@@ -1,0 +1,316 @@
+{% extends 'base_sim.html' %} 
+{% block content %}
+    
+    <form id="format-form" action="{% url 'add_affect' %}" method="POST" class="tm-contact-form mx-auto">
+        {% csrf_token %}
+    <div >
+        <input type="text" name="numeroTicket" id="numeroTicket" placeholder="Ticket" />
+        <input type="number" name="numero" id="numero" placeholder="numero"/>
+        <select  id="fofaitid" name="fofaitid">
+        {% for forfait in forfaits %}
+          
+                <option value="{{ forfait.id }}">{{ forfait.libelle }}</option>
+            
+        {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="matricule"><h3>Matricule</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Matricule" name="id_collaborateur" id="id_collaborateur">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="nom"><h3>Nom</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="Nom" name="id_nom" id="id_nom" disabled="disabled">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="prenom"><h3>Prénom(s)</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="Prénom(s)" name="id_prenom" id="id_prenom" disabled="disabled">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3 mt-5 mb-5">
+            <div class="col-md-6 ">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="num_ticket"><h3>Numéro de ticket</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Numéro du ticket" name="numeroTicket" id="numeroTicket">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="operateur"><h3>Opérateur</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <select class="form-select" style="width: 100%;" name="id_operateur" id="id_operateur">
+                            {% for operateur in operateurs %}
+                            <option value="{{ operateur.id }}">{{ operateur.libelle }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="identifiant"><h3>Identifiant</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" name="id_identifiant" class="form-control" disabled="disabled"  id="id_identifiant">    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="etat"><h3>Etat</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <select class="form-select" style="width: 100%;" name="id_etat" id="id_etat">
+                            {% for etat in etats %}
+                            <option value="{{ etat.id }}">{{ etat.libelle }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="acces"><h3>Accès SIM</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <select class="form-select" style="width: 100%;" name="id_acces" id="id_acces">
+                            {% for acces in access %}
+                            <option value="{{ access.id }}">{{ acces.libelle }}</option>
+                            {% endfor %}
+                        </select>          
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="num_telephone"><h3>Numéro Téléphone</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Numéro de téléphone" name="num_telephone" id="num_telephone">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="adresse_ip"><h3>Adresse IP</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Adresse IP" name="adresse_ip" id="adresse_ip">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="forfait"><h3>Forfait</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <select class="form-select" id="id_forfait" name="id_forfait">
+                        {% for forfait in forfaits %}
+                                <option value="{{ forfait.id }}">{{ forfait.libelle }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="type_sim"><h3>Type SIM</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" name="typeSim_id" class="form-control" disabled="disabled" id="id_typeSim_id">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="ref_voix"><h3>Montant Plafond Voix</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" name="montantPlafondVoix" class="form-control" disabled="disabled" id="id_montantPlafondVoix">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="ref_data"><h3>Montant Plafond Data</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" name="montantPlafondData" class="form-control"  disabled="disabled" id="id_montantPlafondData">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-md-3">
+        <br>
+        <button class="btn btn-success" style="background: #176F62;">Affecter</button>
+    </div>
+</form>
+    
+    
+    <script>
+        $(document).ready(function() {
+          // Fonction de mise à jour des champs
+          function updatePlafondFields() {
+            var operateurField = $("#id_operateur");
+            var identifiantField = $("#id_identifiant");
+            
+            var selectedOperateur = operateurField.val();
+
+            console.log(selectedOperateur)
+            
+            // Requête AJAX pour récupérer les données du forfait sélectionné
+            $.ajax({
+              url: "{% url 'get_operateur' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
+              data: {
+                operateur_id: selectedOperateur  // ID du forfait sélectionné à envoyer au serveur
+              },
+              dataType: "json",
+              success: function(data) {
+                if (data) {
+                    identifiantField.val(data.identifiant);
+                } else {
+                    identifiantField.val("");
+                }
+              }
+            });
+          }
+          
+          // Écouteur d'événement pour la modification du champ "forfait"
+          var operateurField = $("#id_operateur");
+          operateurField.on("change", updatePlafondFields);
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+          // Fonction de mise à jour des champs
+          function updatePlafondFields() {
+            var forfaitField = $("#id_forfait");
+            var montantPlafondVoixField = $("#id_montantPlafondVoix");
+            var montantPlafondDataField = $("#id_montantPlafondData");
+            var plafondInterneField = $("#id_plafondInterne");
+            var typeSim_idField = $("#id_typeSim_id");
+            
+            var selectedForfait = forfaitField.val();
+            
+            // Requête AJAX pour récupérer les données du forfait sélectionné
+            $.ajax({
+              url: "{% url 'get_forfait' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
+              data: {
+                forfait_id: selectedForfait  // ID du forfait sélectionné à envoyer au serveur
+              },
+              dataType: "json",
+              success: function(data) {
+                if (data) {
+                  montantPlafondVoixField.val(data.montantPlafondVoix);
+                  montantPlafondDataField.val(data.montantPlafondData);
+                  plafondInterneField.val(data.plafondInterne);
+                  typeSim_idField.val(data.typeSim_id);
+                } else {
+                  montantPlafondVoixField.val("");
+                  montantPlafondDataField.val("");
+                  plafondInterneField.val("");
+                  typeSim_idField.val("");
+                }
+              }
+            });
+          }
+          
+          // Écouteur d'événement pour la modification du champ "forfait"
+          var forfaitField = $("#id_forfait");
+          forfaitField.on("change", updatePlafondFields);
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+          // Fonction de mise à jour des champs
+          function updatePlafondFields() {
+            var collaborateurField = $("#id_collaborateur");
+            var nomField = $("#id_nom");
+            var prenomField = $("#id_prenom");
+            
+            var selectedCollaborateur = collaborateurField.val();
+            
+            // Requête AJAX pour récupérer les données du forfait sélectionné
+            $.ajax({
+              url: "{% url 'get_collaborateur' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
+              data: {
+                collaborateur_id: selectedCollaborateur  // ID du forfait sélectionné à envoyer au serveur
+              },
+              dataType: "json",
+              success: function(data) {
+                if (data) {
+                  nomField.val(data.nom);
+                  prenomField.val(data.prenom);
+                } else {
+                  nomField.val("");
+                  prenomField.val("");
+                }
+              }
+            });
+          }
+          
+          // Écouteur d'événement pour la modification du champ "forfait"
+          var collaborateurField = $("#id_collaborateur");
+          collaborateurField.on("change", updatePlafondFields);
+        });
+    </script>
+{% endblock %}

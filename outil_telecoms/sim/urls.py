@@ -18,6 +18,7 @@ urlpatterns = [
     #auto complète
     path('get_forfait/', get_forfait, name='get_forfait'),
     path('get_collaborateur/', get_collaborateur, name='get_collaborateur'),
+    path('get_operateur/', get_operateur, name='get_operateur'),
     #PARAMETRAGE
     ##paramètrage sim
     ###profil
@@ -52,7 +53,7 @@ urlpatterns = [
     path('type_sim/<int:pk>/delete/', Type_SimDeleteView.as_view(), name='delete_type_sim'),
     
     #test
-    path('my_view/', MyFormView.as_view(),name='my_view'),
+    # path('my_view/', MyFormView.as_view(),name='my_view'),
      
     # path('list_affectation_sim/',AffectationSimListView.as_view(),name='list_affectation_sim'),
     path('test/',CombinedTest.as_view(),name='test'),
@@ -69,4 +70,8 @@ urlpatterns = [
     # path('division/<int:pk>/update/', DivisionUpdateView.as_view(), name='update_division'),
     # path('create_division/',DivisionCreateView.as_view(),name='create_division'),
     # path('list_division/',DivisionListView.as_view(),name='list_division'),
+    
+    #######################################################################
+    path('affect/', sim_view, name='sim_view' ),
+    path('add_affect',affect_sim, name='add_affect'),
 ]

@@ -1,6 +1,6 @@
 {% extends '../base_sim.html' %} 
 {% block content %}
-<form method="post" action="{% url 'my_view' %}">
+<form method="post" action="{% url 'complet' %}">
     {% csrf_token %}
     {{ model1_form.as_p }}
     {{ model2_form.as_p }}

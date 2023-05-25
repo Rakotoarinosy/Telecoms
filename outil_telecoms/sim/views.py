@@ -1,4 +1,5 @@
-from django.shortcuts import render,redirect
+from datetime import datetime
+from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
@@ -111,6 +112,17 @@ class OperateurView(TemplateView):
         context['operateurs'] = Operateur.objects.all()
         context['form'] = OperateurForm()
         return context
+    
+def get_operateur(request):
+    operateur_id = request.GET.get('operateur_id')  # Correction : utiliser 'collaborateur_id' au lieu de 'collaborateur'
+    try:
+        operateur = Operateur.objects.get(id=operateur_id)  # Correction : utiliser 'id' au lieu de 'collaborateur'
+        data = {
+            'identifiant': operateur.identifiant,
+        }
+        return JsonResponse(data)
+    except Collaborateur.DoesNotExist:
+        return JsonResponse({'error': 'operateur introuvable'})
 
 ###ACCESS
 class AccesCreateView(FormView):
@@ -336,14 +348,14 @@ class Ticket_creat_sim(FormView):
         form.save()
         return super().form_valid(form)
     
-class CombinedFormView1(FormView):
-    template_name = 'Sim/combined1.html'
-    form_class = CombinedCompletForm
-    success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
+# class CombinedFormView1(FormView):
+#     template_name = 'Sim/combined1.html'
+#     form_class = CombinedCompletForm
+#     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
+#     def form_valid(self, form):
+#         form.save()
+#         return super().form_valid(form)
     
 class CombinedTest(FormView):
     template_name = 'Sim/combined.html'
@@ -353,40 +365,6 @@ class CombinedTest(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-
-    
-
-# def combined_form_view(request):
-#     if request.method == 'POST':
-#         form = CombinedForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             # Redirigez vers une autre page ou affichez un message de succès
-#     else:
-#         form = CombinedForm()
-    
-#     return render(request, 'Sim/combined.html', {'form': form})
-
-# class CombinedFormView(FormView):
-#     template_name = 'Sim/combined.html'
-#     form_class = CombinedForm
-#     success_url = reverse_lazy('list_affectation_sim')  # URL de redirection en cas de succès
-
-#     def form_valid(self, form):
-#         form.save()
-#         return super().form_valid(form)
-    
-    
-# def CombinedFormView1(request):
-#     if request.method == 'POST':
-#         form = CombinedForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             # Redirigez vers une autre page ou affichez un message de succès
-#     else:
-#         form =  CombinedCompetForm
-    
-#     return render(request, 'Sim/combined1.html', {'form': form})
 
 #Division
 # class DivisionCreateView(CreateView):
@@ -439,7 +417,7 @@ class CombinedTest(FormView):
 #     })
 
 #Mandeh fa version mbola mila alamina sy spésifiene ny champs fa misy miveina indroa
-class MyFormView(FormView):
+class CombinedFormView1(FormView):
     template_name = 'Sim/my_template.html'
     form_class = AffectationSimForm  # Utilisez l'un des formulaires pour initialiser la vue
     success_url = reverse_lazy('list_affectation_sim')
@@ -474,3 +452,65 @@ class MyFormView(FormView):
         # Redirection vers une page de succès, par exemple
         return super().form_valid(form)
 
+##############################################################
+def sim_view(request):
+    forfaits = Forfait.objects.all()
+    acces = Acces_sim.objects.all()
+    etat = Etat.objects.all()
+    operateur = Operateur.objects.all()
+    contexte_acces = {
+        "access": acces,
+        # Ajoutez d'autres clés et valeurs spécifiques à AutreModele1
+    }
+
+    contexte_etat = {
+        "etats": etat,
+        # Ajoutez d'autres clés et valeurs spécifiques à AutreModele2
+    }
+
+    contexte_operateur = {
+        "operateurs": operateur,
+        # Ajoutez d'autres clés et valeurs spécifiques à AutreModele3
+    }
+
+    # Fusionnez tous les dictionnaires de contexte avec le contexte existant
+    contexte_global = {
+        "forfaits": forfaits,
+        **contexte_acces,
+        **contexte_etat,
+        **contexte_operateur,
+    }
+       
+    return render (request,'sim/affectation_siml.html', context=contexte_global)
+
+def affect_sim(request) :
+    if request.method == 'POST':
+        ticket = request.POST.get('numeroTicket')
+        numeros = request.POST.get('numero')
+
+        sims = Sim.objects.filter(numero= numeros)
+        if sims.exists() : 
+            return render(request,'sim/affectation_siml.html')
+        tickets = Ticket.objects.filter (numero_ticket = ticket)
+        if not tickets.exists() : 
+            compte_fact=  get_object_or_404(Compte_facturation,id= 1)
+            ticket_model = Ticket.objects.create(
+                numero_ticket = ticket,
+                dateDemande = datetime.now(),
+                dateApprobation = datetime.now(),
+                compte_facturation = compte_fact
+            )
+        #num_tickets = Ticket.objects.filter (numero_ticket = ticket)
+        Op = get_object_or_404(Operateur,id= request.POST.get('id_operateur'))
+        ac = get_object_or_404(Acces_sim,id= request.POST.get('id_acces'))
+        et= get_object_or_404(Etat,id= request.POST.get('id_etat'))
+        forf = get_object_or_404(Forfait,id= request.POST.get('id_forfait'))
+        sim_models = Sim.objects.create(
+            numero = numeros,
+            adresseIP = '101.101.101.101',
+            operateur = Op,
+            acces = ac,
+            etat = et,
+            forfait = forf
+        )
+        return render(request,'sim/affectation_siml.html')
