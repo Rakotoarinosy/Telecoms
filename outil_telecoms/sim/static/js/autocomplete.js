@@ -1,6 +1,33 @@
 $(document).ready(function() {
     // Fonction de mise à jour des champs
     function updatePlafondFields() {
+        var operateurField = $("#id_operateur");
+        var identifiantField = $("#id_identifiant");
+        var selectedOperateur = operateurField.val();
+        // Requête AJAX pour récupérer les données du forfait sélectionné
+        $.ajax({
+            url: "{% url 'get_operateur' %}", // L'URL de la vue Django qui renvoie les détails du forfait
+            data: {
+                operateur_id: selectedOperateur // ID du forfait sélectionné à envoyer au serveur
+            },
+            dataType: "json",
+            success: function(data) {
+                if (data) {
+                    identifiantField.val(data.identifiant);
+                } else {
+                    identifiantField.val("");
+                }
+            }
+        });
+    }
+    // Écouteur d'événement pour la modification du champ "forfait"
+    var operateurField = $("#id_operateur");
+    operateurField.on("change", updatePlafondFields);
+});
+
+$(document).ready(function() {
+    // Fonction de mise à jour des champs
+    function updatePlafondFields() {
         var forfaitField = $("#id_forfait");
         var montantPlafondVoixField = $("#id_montantPlafondVoix");
         var montantPlafondDataField = $("#id_montantPlafondData");
