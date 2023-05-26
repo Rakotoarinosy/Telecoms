@@ -112,17 +112,7 @@ class OperateurView(TemplateView):
         context['operateurs'] = Operateur.objects.all()
         context['form'] = OperateurForm()
         return context
-    
-def get_operateur(request):
-    operateur_id = request.GET.get('operateur_id')  # Correction : utiliser 'collaborateur_id' au lieu de 'collaborateur'
-    try:
-        operateur = Operateur.objects.get(id=operateur_id)  # Correction : utiliser 'id' au lieu de 'collaborateur'
-        data = {
-            'identifiant': operateur.identifiant,
-        }
-        return JsonResponse(data)
-    except Collaborateur.DoesNotExist:
-        return JsonResponse({'error': 'operateur introuvable'})
+
 
 ###ACCESS
 class AccesCreateView(FormView):
@@ -266,22 +256,8 @@ class AffectationSimCreateView(FormView):
         context['form'] = self.get_form()
         context['collaborateurs'] = Collaborateur.objects.all().values('id', 'nom', 'prenom')
         return context
-    
-# Auto complete_collaborateur_AffectationSimCreateView
-def get_collaborateur(request):
-    collaborateur_id = request.GET.get('collaborateur_id')  # Correction : utiliser 'collaborateur_id' au lieu de 'collaborateur'
 
-    try:
-        collaborateur = Collaborateur.objects.get(id=collaborateur_id)  # Correction : utiliser 'id' au lieu de 'collaborateur'
-        data = {
-            'nom': collaborateur.nom,
-            'prenom': collaborateur.prenom,
-        }
-        return JsonResponse(data)
-    except Collaborateur.DoesNotExist:
-        return JsonResponse({'error': 'Collaborateur introuvable'})
-
-    
+      
 #List_affecation   
 class AffectationSimListView(ListView):
     model = Affectation_sim
@@ -313,22 +289,7 @@ class SimCreateView(FormView):
         context['forfaits'] = Forfait.objects.all().values('id', 'montantPlafondVoix', 'montantPlafondData','typeSim_id')
         return context      
     
-# Auto complete_forfait_SimCreateView
-def get_forfait(request):
-    forfait_id = request.GET.get('forfait_id')  # Correction : utiliser 'forfait_id' au lieu de 'forfait'
-
-    try:
-        forfait = Forfait.objects.get(id=forfait_id)  # Correction : utiliser 'id' au lieu de 'forfait'
-        data = {
-            'montantPlafondVoix': forfait.montantPlafondVoix,
-            'montantPlafondData': forfait.montantPlafondData,
-            'typeSim_id': forfait.typeSim_id,
-            'plafondInterne': forfait.plafondInterne,
-        }
-        return JsonResponse(data)
-    except Forfait.DoesNotExist:
-        return JsonResponse({'error': 'Forfait introuvable'})
-    
+  
 
 class TicketCreateView(FormView):
     template_name = 'Sim/Ticket_create_sim.html'
@@ -458,59 +419,107 @@ def sim_view(request):
     acces = Acces_sim.objects.all()
     etat = Etat.objects.all()
     operateur = Operateur.objects.all()
+    collaborateur = Collaborateur.objects.all()
     contexte_acces = {
         "access": acces,
-        # Ajoutez d'autres clés et valeurs spécifiques à AutreModele1
     }
-
     contexte_etat = {
         "etats": etat,
-        # Ajoutez d'autres clés et valeurs spécifiques à AutreModele2
     }
-
     contexte_operateur = {
         "operateurs": operateur,
-        # Ajoutez d'autres clés et valeurs spécifiques à AutreModele3
     }
-
-    # Fusionnez tous les dictionnaires de contexte avec le contexte existant
     contexte_global = {
         "forfaits": forfaits,
         **contexte_acces,
         **contexte_etat,
         **contexte_operateur,
     }
-       
     return render (request,'sim/affectation_siml.html', context=contexte_global)
 
 def affect_sim(request) :
     if request.method == 'POST':
         ticket = request.POST.get('numeroTicket')
         numeros = request.POST.get('numero')
-
+        dateDemande = request.POST.get('dateDemande')
+        dateApprobation = request.POST.get('dateApprobation')
+        adresseIp = request.POST.get('adresse_ip')
+        collabo = request.POST.get('matricule')
+        
         sims = Sim.objects.filter(numero= numeros)
         if sims.exists() : 
-            return render(request,'sim/affectation_siml.html')
+            return render(request,'Sim/affectation_siml.html')
         tickets = Ticket.objects.filter (numero_ticket = ticket)
         if not tickets.exists() : 
-            compte_fact=  get_object_or_404(Compte_facturation,id= 1)
+            compte_fact=  compte_fact=  get_object_or_404(Compte_facturation,id= 1)
             ticket_model = Ticket.objects.create(
                 numero_ticket = ticket,
-                dateDemande = datetime.now(),
-                dateApprobation = datetime.now(),
-                compte_facturation = compte_fact
+                dateDemande = dateDemande,
+                dateApprobation = dateApprobation,
+                compte_facturation = compte_fact,
             )
-        #num_tickets = Ticket.objects.filter (numero_ticket = ticket)
-        Op = get_object_or_404(Operateur,id= request.POST.get('id_operateur'))
+        num_tickets = Ticket.objects.filter (numero_ticket = ticket)
+        forf = get_object_or_404(Forfait,id= request.POST.get('id_forfait'))
+        op = get_object_or_404(Operateur,id= request.POST.get('id_operateur'))
         ac = get_object_or_404(Acces_sim,id= request.POST.get('id_acces'))
         et= get_object_or_404(Etat,id= request.POST.get('id_etat'))
-        forf = get_object_or_404(Forfait,id= request.POST.get('id_forfait'))
         sim_models = Sim.objects.create(
             numero = numeros,
-            adresseIP = '101.101.101.101',
-            operateur = Op,
+            adresseIP = adresseIp,
+            operateur = op,
             acces = ac,
             etat = et,
-            forfait = forf
+            forfait = forf,
         )
-        return render(request,'sim/affectation_siml.html')
+        collaborateur = Collaborateur.objects.get(matricule=collabo)
+        if collaborateur:
+            affectation_sim = Affectation_sim.objects.create(
+                collaborateur=collaborateur,
+                sim=sim_models,
+                ticket=num_tickets.first(),
+            )
+            return redirect('list_affectation_sim')
+
+    
+# Auto complete_collaborateur_AffectationSimCreateView
+def get_collaborateur_info(request):
+    matricule = request.GET.get('matricule')
+    collaborateur = Collaborateur.objects.filter(matricule=matricule).first()
+    if collaborateur:
+        response = {
+            'nom': collaborateur.nom,
+            'prenom': collaborateur.prenom,
+            'id': collaborateur.id,
+        }
+    else:
+        response = {'error': 'operateur introuvable'}
+    return JsonResponse(response)
+    
+def get_operateur(request):
+    operateur_id = request.GET.get('operateur_id')  # Correction : utiliser 'collaborateur_id' au lieu de 'collaborateur'
+    try:
+        operateur = Operateur.objects.get(id=operateur_id)  # Correction : utiliser 'id' au lieu de 'collaborateur'
+        data = {
+            'identifiant': operateur.identifiant,
+        }
+        return JsonResponse(data)
+    except Collaborateur.DoesNotExist:
+        return JsonResponse({'error': 'operateur introuvable'})
+    
+# Auto complete_forfait_SimCreateView
+def get_forfait(request):
+    forfait_id = request.GET.get('forfait_id')  # Correction : utiliser 'forfait_id' au lieu de 'forfait'
+
+    try:
+        forfait = Forfait.objects.get(id=forfait_id) 
+        type_sim = Type_sim.objects.get(id=forfait.typeSim_id)
+        # Correction : utiliser 'id' au lieu de 'forfait'
+        data = {
+            'montantPlafondVoix': forfait.montantPlafondVoix,
+            'montantPlafondData': forfait.montantPlafondData,
+            'typeSim_id': type_sim.libelle,
+            'plafondInterne': forfait.plafondInterne,
+        }
+        return JsonResponse(data)
+    except Forfait.DoesNotExist:
+        return JsonResponse({'error': 'Forfait introuvable'})

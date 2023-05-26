@@ -17,7 +17,7 @@ urlpatterns = [
     # path('combined-form/', combined_form_view, name='combined_form_view'),
     #auto complète
     path('get_forfait/', get_forfait, name='get_forfait'),
-    path('get_collaborateur/', get_collaborateur, name='get_collaborateur'),
+    path('get_collaborateur/', get_collaborateur_info, name='get_collaborateur'),
     path('get_operateur/', get_operateur, name='get_operateur'),
     #PARAMETRAGE
     ##paramètrage sim
@@ -73,5 +73,5 @@ urlpatterns = [
     
     #######################################################################
     path('affect/', sim_view, name='sim_view' ),
-    path('add_affect',affect_sim, name='add_affect'),
+    path('add_affect/',affect_sim, name='add_affect'),
 ]
