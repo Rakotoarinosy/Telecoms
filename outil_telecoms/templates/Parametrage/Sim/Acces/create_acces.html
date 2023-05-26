@@ -1,0 +1,28 @@
+{% extends '../base_parametrage_sim.html' %}
+{% block titre1 %}Parametrage SIM{% endblock titre1 %}
+
+{% block titre2 %}Type d'accès{% endblock titre2 %}
+
+{% block content %}
+
+  <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
+    <a class="btn btn-primary mt-5 mb-5" href="{% url 'acces' %}" >Retour</a>
+    <h1 class="text-center">Ajout d'un nouvel accès</h1>
+        <form class="card-body px-4 py-5 px-md-5" method="post">{% csrf_token %}          
+          {{ form.as_p }}
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              <strong>Erreurs :</strong>
+              <ul>
+                {% for field_errors in form.errors.values %}
+                  {% for error in field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
+        </form>
+  </div>
+{% endblock content %}

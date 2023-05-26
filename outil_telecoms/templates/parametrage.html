@@ -1,0 +1,20 @@
+{% extends 'sim.html' %}
+{% block option %}PARAMETRAGE{% endblock option %}
+
+{% block sous_menu %}
+<div class="col">
+    <a href="{% url 'profil' %}">
+        <h1 class="btn btn-success form-control" style="background: #176F62;">GESTION UTILISATEUR</h1>
+    </a>
+</div>
+<div class="col">
+    <a href="{% url 'operateur' %}">
+        <h1 class="btn btn-success form-control" style="background: #176F62;">SIM</h1>
+    </a>
+</div>
+<div class="col">
+    <a href="{% url 'type_equipement' %}">
+        <h1 class="btn btn-success form-control" style="background: #176F62;">EQUIPEMENT</h1>
+    </a>
+</div>
+{% endblock sous_menu %}
