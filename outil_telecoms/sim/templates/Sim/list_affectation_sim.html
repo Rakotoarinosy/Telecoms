@@ -10,6 +10,8 @@
               <th>Nom</th>
               <th>Prénom(s)</th>
               <th>Ticket</th>
+              <th>Date de demande</th>
+              <th>Date d'approbation</th>
               <th>Date d'affectation</th>
               <th>Date d'activation</th>
               <th>Date de Desactivation</th>
@@ -30,7 +32,9 @@
               <td>{{ affectationSim.collaborateur.nom}}</td>
               <td>{{ affectationSim.collaborateur.prenom}}</td>
               <td>{{ affectationSim.ticket}}</td>
-              <td>{{ affectationSim.ticket.dateAffectation }}</td>
+              <td>{{ affectationSim.ticket.dateDemande}}</td>
+              <td>{{ affectationSim.ticket.dateApprobation}}</td>
+              <td>{{ affectationSim.dateAffectation }}</td>
               <td>{{ affectationSim.dateActivation }}</td>
               <td>{{ affectationSim.dateDesactivation }}</td>
               <td>{{ affectationSim.dateModification }}</td>
@@ -38,7 +42,7 @@
               <td>{{ affectationSim.sim.forfait.libelle}}</td>
               <td>{{ affectationSim.sim.numero }}</td>
               <td>{{ affectationSim.sim.adresseIP }}</td>
-              <td>{{ affectationSim.sim.acces }}</td>
+              <td>{{ affectationSim.acces }}</td>
               <td><a href="{% url 'update_affectation_sim' pk=affectationSim.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
             </tr>
           </tbody>

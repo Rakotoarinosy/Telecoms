@@ -144,6 +144,11 @@ class SimForm(forms.ModelForm):
             'operateur': forms.Select(attrs={'class': 'form-control'}),
             'etat': forms.Select(attrs={'class': 'form-control'}),
         }
+    def clean_numero(self):
+        numero = self.cleaned_data.get('numero') 
+        # Vérifier si l'identifiant existe déjà
+        if Sim.objects.filter(numero=numero).exclude(id=self.instance.id).exists(): 
+            raise ValidationError("Ce numéro existe déjà.") 
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -178,26 +183,25 @@ class TicketForm(forms.ModelForm):
         self.fields['numero_ticket'].label = "Numéro Ticket"
        
 class AffectationSimForm(forms.ModelForm):
-    collaborateur = forms.ModelChoiceField(queryset=Collaborateur.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+    collaborateur = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'matricule', 'name': 'matricule'}))
+
     class Meta:
         model = Affectation_sim
         fields = "__all__"
+        exclude = ["ticket", "sim", "dateModification", "dateDesactivation"]
         widgets = {
             'ticket': forms.Select(attrs={'class': 'form-control'}),
             'sim': forms.Select(attrs={'class': 'form-control'}),
-        }     
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance')
         if instance and instance.forfait:
-            self.fields['collaborateur'].queryset = Collaborateur.objects.filter(id=instance.collaborateur.id)
-            self.fields['collaborateur'].initial = instance.collaborateur.id
-            self.fields['nom'] = forms.CharField(initial=instance.collaborateur.nom, required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
-            self.fields['prenom'] = forms.CharField(initial=instance.collaborateur.prenom, required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
-        else:
-            self.fields['nom'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled',}))
-            self.fields['prenom'] = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control','disabled': 'disabled'}))     
-        
+            self.fields['collaborateur'].initial = instance.collaborateur.nom
+        self.fields['nom'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'disabled': 'disabled'}))
+        self.fields['prenom'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'disabled': 'disabled'}))
+
 class Affectation_simFormUpdate(forms.ModelForm):
     class Meta:
         model = Affectation_sim

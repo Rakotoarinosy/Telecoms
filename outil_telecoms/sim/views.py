@@ -355,58 +355,37 @@ class CombinedTest(FormView):
 #         return Forfait.objects.all()
     
 #TEST
-
-#combinaisons sim ticket mandeh
-# def my_view(request):
-#     model1_form = TicketForm()
-#     model2_form = SimForm()
-
-#     if request.method == 'POST':
-#         model1_form = TicketForm(request.POST)
-#         model2_form = SimForm(request.POST)
-
-#         if model1_form.is_valid() and model2_form.is_valid():
-#             # Enregistrer les données dans les modèles
-#             model1_instance = model1_form.save()
-#             model2_instance = model2_form.save()
-
-#             # Autres opérations...
-
-#     return render(request, 'Sim/my_template.html', {
-#         'model1_form': model1_form,
-#         'model2_form': model2_form,
-#     })
-
-#Mandeh fa version mbola mila alamina sy spésifiene ny champs fa misy miveina indroa
 class CombinedFormView1(FormView):
-    template_name = 'Sim/my_template.html'
+    template_name = 'Sim/create_affectation_sim.html'
     form_class = AffectationSimForm  # Utilisez l'un des formulaires pour initialiser la vue
     success_url = reverse_lazy('list_affectation_sim')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['model1_form'] = TicketForm()
-        context['model2_form'] = SimForm()
-        context['model3_form'] = AffectationSimForm()
+        context['Ticket_form'] = TicketForm()
+        context['Sim_form'] = SimForm()
+        context['AffectationSim_form'] = AffectationSimForm()
         return context
 
     def post(self, request, *args, **kwargs):
-        model1_form = TicketForm(request.POST)
-        model2_form = SimForm(request.POST)
-        model3_form = AffectationSimForm(request.POST)
+        Ticket_form = TicketForm(request.POST)
+        Sim_form = SimForm(request.POST)
+        AffectationSim_form = AffectationSimForm(request.POST)
 
-        if model1_form.is_valid() and model2_form.is_valid() and model3_form.is_valid():
+        if Ticket_form.is_valid() and Sim_form.is_valid() and AffectationSim_form.is_valid():
             # Enregistrer les données dans les modèles
-            model1_instance = model1_form.save()
-            model2_instance = model2_form.save()
-            model3_instance = model3_form.save()
+            ticket_instance = Ticket_form.save()
+            sim_instance = Sim_form.save()
 
-            # Autres opérations...
+            affectation_sim_instance = AffectationSim_form.save(commit=False)
+            affectation_sim_instance.ticket = ticket_instance
+            affectation_sim_instance.sim = sim_instance
+            affectation_sim_instance.save()
 
-            return self.form_valid(model1_form)  # Redirection après succès
+            return self.form_valid(Ticket_form)  # Redirection après succès
 
         else:
-            return self.form_invalid()
+            return self.form_invalid(form=AffectationSim_form)
 
     def form_valid(self, form):
         # Logique à exécuter lorsque tous les formulaires sont valides
@@ -484,16 +463,18 @@ def affect_sim(request) :
 # Auto complete_collaborateur_AffectationSimCreateView
 def get_collaborateur_info(request):
     matricule = request.GET.get('matricule')
-    collaborateur = Collaborateur.objects.filter(matricule=matricule).first()
+    collaborateur = Collaborateur.objects.filter(matricule__contains=matricule).values()
     if collaborateur:
-        response = {
-            'nom': collaborateur.nom,
-            'prenom': collaborateur.prenom,
-            'id': collaborateur.id,
-        }
+        response = []
+        for c in collaborateur:
+            response.append({ 
+            'matricule': c["matricule"],      
+            'nom': c["nom"],
+            'prenom': c["prenom"],
+        })
     else:
-        response = {'error': 'operateur introuvable'}
-    return JsonResponse(response)
+        response = {'error': 'collaborateur introuvable'}
+    return JsonResponse({"response":response})
     
 def get_operateur(request):
     operateur_id = request.GET.get('operateur_id')  # Correction : utiliser 'collaborateur_id' au lieu de 'collaborateur'
