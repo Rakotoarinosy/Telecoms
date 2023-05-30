@@ -132,7 +132,6 @@ class ForfaitFormUpdate(forms.ModelForm):
     
 class SimForm(forms.ModelForm):
     forfait = forms.ModelChoiceField(queryset=Forfait.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-    
     class Meta:
         model = Sim
         fields = "__all__"

@@ -109,7 +109,7 @@ class Forfait(models.Model):
         
 class Sim(models.Model):
     numero = models.IntegerField(verbose_name="Numéro Téléphone")
-    adresseIP = models.CharField(verbose_name="Adresse IP")
+    adresseIP = models.CharField(verbose_name="Adresse IP",blank=True,null=True)
     operateur = models.ForeignKey(Operateur,on_delete=models.SET_NULL,null=True,verbose_name="Opérateur")
     acces = models.ForeignKey(Acces_sim,on_delete=models.SET_NULL,null=True,verbose_name="Accès")
     etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True,verbose_name="Etat")

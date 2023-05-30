@@ -371,6 +371,7 @@ class CombinedFormView1(FormView):
         Ticket_form = TicketForm(request.POST)
         Sim_form = SimForm(request.POST)
         AffectationSim_form = AffectationSimForm(request.POST)
+        
 
         if Ticket_form.is_valid() and Sim_form.is_valid() and AffectationSim_form.is_valid():
             # Enregistrer les données dans les modèles
@@ -394,29 +395,23 @@ class CombinedFormView1(FormView):
 
 ##############################################################
 def sim_view(request):
-    forfaits = Forfait.objects.all()
+    forfait = Forfait.objects.all()
     acces = Acces_sim.objects.all()
     etat = Etat.objects.all()
     operateur = Operateur.objects.all()
-    collaborateur = Collaborateur.objects.all()
-    contexte_acces = {
+    context = {
+        "forfaits": forfait,
         "access": acces,
-    }
-    contexte_etat = {
         "etats": etat,
-    }
-    contexte_operateur = {
         "operateurs": operateur,
     }
-    contexte_global = {
-        "forfaits": forfaits,
-        **contexte_acces,
-        **contexte_etat,
-        **contexte_operateur,
-    }
-    return render (request,'sim/affectation_siml.html', context=contexte_global)
+    return render(request, 'sim/affectation_siml.html', context=context)
 
-def affect_sim(request) :
+def affect_sim(request):
+    forfait = Forfait.objects.all()
+    acces = Acces_sim.objects.all()
+    etat = Etat.objects.all()
+    operateur = Operateur.objects.all()
     if request.method == 'POST':
         ticket = request.POST.get('numeroTicket')
         numeros = request.POST.get('numero')
@@ -424,31 +419,52 @@ def affect_sim(request) :
         dateApprobation = request.POST.get('dateApprobation')
         adresseIp = request.POST.get('adresse_ip')
         collabo = request.POST.get('matricule')
+
+        op = get_object_or_404(Operateur, id=request.POST.get('id_operateur'))
+        identifiant = str(op.identifiant)  # Récupérer l'identifiant de l'opérateur
+
+        if numeros[:2] != identifiant[:2] and numeros[:3] != identifiant[:3]:
+            message = "Le numéro ne correspond pas à l'identifiant de l'opérateur"
+            return render(request, 'Sim/affectation_siml.html', {
+                'message': message,
+                "forfaits": forfait,
+                "access": acces,
+                "etats": etat,
+                "operateurs": operateur,
+            })
+            
+        sims = Sim.objects.filter(numero=numeros)
+        if sims.exists():
+            return render(request, 'Sim/affectation_siml.html',{'message': 'Ce numéro existe déjà',
+        "forfaits": forfait,
+        "access": acces,
+        "etats": etat,
+        "operateurs": operateur,
         
-        sims = Sim.objects.filter(numero= numeros)
-        if sims.exists() : 
-            return render(request,'Sim/affectation_siml.html')
-        tickets = Ticket.objects.filter (numero_ticket = ticket)
-        if not tickets.exists() : 
-            compte_fact=  compte_fact=  get_object_or_404(Compte_facturation,id= 1)
+        })
+
+        tickets = Ticket.objects.filter(numero_ticket=ticket)
+        if not tickets.exists():
+            compte_fact = get_object_or_404(Compte_facturation, id=1)
             ticket_model = Ticket.objects.create(
-                numero_ticket = ticket,
-                dateDemande = dateDemande,
-                dateApprobation = dateApprobation,
-                compte_facturation = compte_fact,
+                numero_ticket=ticket,
+                dateDemande=dateDemande,
+                dateApprobation=dateApprobation,
+                compte_facturation=compte_fact,
             )
-        num_tickets = Ticket.objects.filter (numero_ticket = ticket)
-        forf = get_object_or_404(Forfait,id= request.POST.get('id_forfait'))
-        op = get_object_or_404(Operateur,id= request.POST.get('id_operateur'))
-        ac = get_object_or_404(Acces_sim,id= request.POST.get('id_acces'))
-        et= get_object_or_404(Etat,id= request.POST.get('id_etat'))
+
+        num_tickets = Ticket.objects.filter(numero_ticket=ticket)
+        forf = get_object_or_404(Forfait, id=request.POST.get('id_forfait'))
+        op = get_object_or_404(Operateur, id=request.POST.get('id_operateur'))
+        ac = get_object_or_404(Acces_sim, id=request.POST.get('id_acces'))
+        et = get_object_or_404(Etat, id=request.POST.get('id_etat'))
         sim_models = Sim.objects.create(
-            numero = numeros,
-            adresseIP = adresseIp,
-            operateur = op,
-            acces = ac,
-            etat = et,
-            forfait = forf,
+            numero=numeros,
+            adresseIP=adresseIp,
+            operateur=op,
+            acces=ac,
+            etat=et,
+            forfait=forf,
         )
         collaborateur = Collaborateur.objects.get(matricule=collabo)
         if collaborateur:
@@ -458,6 +474,9 @@ def affect_sim(request) :
                 ticket=num_tickets.first(),
             )
             return redirect('list_affectation_sim')
+
+    return render(request, 'Sim/affectation_siml.html')
+
 
     
 # Auto complete_collaborateur_AffectationSimCreateView
