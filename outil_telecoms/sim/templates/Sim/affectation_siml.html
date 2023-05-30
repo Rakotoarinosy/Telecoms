@@ -320,23 +320,17 @@
           var identifiant = document.getElementById('id_identifiant').value;
 
           if (numero.length >= 2) {
-            var premierCaractere = numero.substring(0, 2);
-            var identifiantCourant = identifiant.substring(0, 2);
-              // Supprimer les zéros non significatifs du numéro
-            numero = numero.replace(/^0+/, '');
-            if (premierCaractere !== identifiantCourant && numero !== identifiant) {
-              document.getElementById('message').textContent = "Le numéro ne correspond pas à l'identifiant";
-              document.getElementById('submit_button').disabled = true; // Bloquer l'envoi du formulaire
+            var premierCaracteresNumero = parseInt(numero, 10).toString().substring(0, 2);
+            var premierCaracteresIdentifiant = identifiant.substring(0, 2);
+
+            if (premierCaracteresNumero !== premierCaracteresIdentifiant) {
+                document.getElementById('message').textContent = "Le numéro ne correspond pas à l'identifiant";
+                document.getElementById('submit_button').disabled = true; // Bloquer l'envoi du formulaire
             } else {
-              document.getElementById('message').textContent = "";
-              document.getElementById('submit_button').disabled = false; // Autoriser l'envoi du formulaire
+                document.getElementById('message').textContent = "";
+                document.getElementById('submit_button').disabled = false; // Autoriser l'envoi du formulaire
             }
         }
-        function validerFormulaire() {
-            var message = document.getElementById('message').textContent;
-            return message === ""; // Autoriser la soumission du formulaire si aucun message d'erreur est présent
-        }
-
       }
     </script>
 
