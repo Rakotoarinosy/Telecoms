@@ -1,0 +1,48 @@
+{% extends '../../base_sim.html' %} 
+{% block titre1 %}Stock équipement{% endblock titre1 %}
+{% block content %}
+<section class="background-radial-gradient overflow-hidden">
+    <div class="container px-4 py-5 px-md-5 text-center text-lg-start my-2">
+        <div class="row gx-lg-5 align-items-center mb-5 ">
+            <div class="col-lg-5 mb-5 mb-lg-0 border border-secondary" style="z-index: 10">
+                <h1 class="text-center">Ajout d'un nouvel stock</h1>
+                <form id="format-form" action="{% url 'add_affect' %}" method="POST" class="tm-contact-form mx-auto">{% csrf_token %} 
+                    <p>
+                        <label for="id_article_modele">Article modele:</label>
+                        <select name="article_modele" class="form-select" required="" id="id_article_modele" required>
+                                <option value=""></option>
+                                {% for article in articles %}
+                                <option value="{{ article.id }}">{{ article.reference_modele }}</option>
+                                {% endfor %}
+                        </select> 
+                    </p>
+                    <p>
+                        <label for="id_quantite">Quantité:</label>
+                        <input type="number" name="quantite" class="form-control" required="" id="id_quantite">
+                    </p>
+                    <p>
+                        <label for="id_pu_ht">Prix Hors Taxe:</label>
+                        <input type="number" name="pu_ht" class="form-control" required="" id="id_pu_ht">
+                    </p>
+                    <p>
+                        <label for="id_prix_global">Prix global:</label>
+                        <input type="number" name="prix_global" class="form-control" required="" id="id_prix_global">
+                    </p>
+                    <p>
+                        <label for="id_facture">Facture:</label>
+                        <select name="facture" class="form-control" required="" id="id_facture">
+                            <option value="" selected=""></option>
+                            <option value="1">FA5635</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="id_bc">Bc:</label>
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Numéro de téléphone" name="numero" id="numero" required>
+                    </p>
+                    <input class="btn btn-success" type="submit" style="background: #176F62;" value="Créer">
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

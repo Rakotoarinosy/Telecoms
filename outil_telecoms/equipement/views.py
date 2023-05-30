@@ -192,3 +192,80 @@ class CreateStockView(View):
             return redirect(self.success_url)
 
         return render(request, self.template_name, {'bc_stock_form': bc_stock_form})
+    
+def stock_equipement_view(request):
+    bc = Bc.objects.all()
+    article = Article_modele.objects.all()
+    context = {
+        "bcs": bc,
+        "articles": article,
+    }
+    return render(request, 'Equipement/Stock/stock_equipement.html', context=context)
+
+def affect_stock_equipement_view(request):
+    bc = Bc.objects.all()
+    article = Article_modele.objects.all()
+    if request.method == 'POST':
+        ticket = request.POST.get('numeroTicket')
+        numeros = request.POST.get('numero')
+        dateDemande = request.POST.get('dateDemande')
+        dateApprobation = request.POST.get('dateApprobation')
+        adresseIp = request.POST.get('adresse_ip')
+        collabo = request.POST.get('matricule')
+
+        op = get_object_or_404(Operateur, id=request.POST.get('id_operateur'))
+        identifiant = str(op.identifiant)  # Récupérer l'identifiant de l'opérateur
+
+        if numeros[:2] != identifiant[:2] and numeros[:3] != identifiant[:3]:
+            message = "Le numéro ne correspond pas à l'identifiant de l'opérateur"
+            return render(request, 'Sim/affectation_siml.html', {
+                'message': message,
+                "forfaits": forfait,
+                "access": acces,
+                "etats": etat,
+                "operateurs": operateur,
+            })
+            
+        sims = Sim.objects.filter(numero=numeros)
+        if sims.exists():
+            return render(request, 'Sim/affectation_siml.html',{'message': 'Ce numéro existe déjà',
+        "forfaits": forfait,
+        "access": acces,
+        "etats": etat,
+        "operateurs": operateur,
+        
+        })
+
+        tickets = Ticket.objects.filter(numero_ticket=ticket)
+        if not tickets.exists():
+            compte_fact = get_object_or_404(Compte_facturation, id=1)
+            ticket_model = Ticket.objects.create(
+                numero_ticket=ticket,
+                dateDemande=dateDemande,
+                dateApprobation=dateApprobation,
+                compte_facturation=compte_fact,
+            )
+
+        num_tickets = Ticket.objects.filter(numero_ticket=ticket)
+        forf = get_object_or_404(Forfait, id=request.POST.get('id_forfait'))
+        op = get_object_or_404(Operateur, id=request.POST.get('id_operateur'))
+        ac = get_object_or_404(Acces_sim, id=request.POST.get('id_acces'))
+        et = get_object_or_404(Etat, id=request.POST.get('id_etat'))
+        sim_models = Sim.objects.create(
+            numero=numeros,
+            adresseIP=adresseIp,
+            operateur=op,
+            acces=ac,
+            etat=et,
+            forfait=forf,
+        )
+        collaborateur = Collaborateur.objects.get(matricule=collabo)
+        if collaborateur:
+            affectation_sim = Affectation_sim.objects.create(
+                collaborateur=collaborateur,
+                sim=sim_models,
+                ticket=num_tickets.first(),
+            )
+            return redirect('list_affectation_sim')
+
+    return render(request, 'Sim/affectation_siml.html')
