@@ -1,13 +1,16 @@
-from django.shortcuts import render,redirect
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import DeleteView
 from django.views.generic import TemplateView
 from django.views.generic import ListView
-from django.views import View 
+from django.views import View
+
+from sim.models import Collaborateur, Compte_facturation, Etat, Ticket 
 from .forms import BcStockForm
-from .models import Reception_article
+from .models import Affectation_article, Reception_article
 
 from equipement.forms import BcForm, ModeleForm, StockForm, TypeEquipementForm
 from equipement.models import Article_modele, Bc, Materiel, Reception_article
@@ -34,7 +37,7 @@ class BcCreateView(FormView):
 # class BcListView(ListView):
 #     model = Bc
 #     template_name = 'Equipement/Bc/bc.html'
-#     context_object_name = 'operateurs'
+#     context_object_name = 'articleerateurs'
 
        
 class BcDeleteView(DeleteView):
@@ -210,32 +213,8 @@ def affect_stock_equipement_view(request):
         numeros = request.POST.get('numero')
         dateDemande = request.POST.get('dateDemande')
         dateApprobation = request.POST.get('dateApprobation')
-        adresseIp = request.POST.get('adresse_ip')
         collabo = request.POST.get('matricule')
-
-        op = get_object_or_404(Operateur, id=request.POST.get('id_operateur'))
-        identifiant = str(op.identifiant)  # Récupérer l'identifiant de l'opérateur
-
-        if numeros[:2] != identifiant[:2] and numeros[:3] != identifiant[:3]:
-            message = "Le numéro ne correspond pas à l'identifiant de l'opérateur"
-            return render(request, 'Sim/affectation_siml.html', {
-                'message': message,
-                "forfaits": forfait,
-                "access": acces,
-                "etats": etat,
-                "operateurs": operateur,
-            })
-            
-        sims = Sim.objects.filter(numero=numeros)
-        if sims.exists():
-            return render(request, 'Sim/affectation_siml.html',{'message': 'Ce numéro existe déjà',
-        "forfaits": forfait,
-        "access": acces,
-        "etats": etat,
-        "operateurs": operateur,
         
-        })
-
         tickets = Ticket.objects.filter(numero_ticket=ticket)
         if not tickets.exists():
             compte_fact = get_object_or_404(Compte_facturation, id=1)
@@ -247,25 +226,24 @@ def affect_stock_equipement_view(request):
             )
 
         num_tickets = Ticket.objects.filter(numero_ticket=ticket)
-        forf = get_object_or_404(Forfait, id=request.POST.get('id_forfait'))
-        op = get_object_or_404(Operateur, id=request.POST.get('id_operateur'))
-        ac = get_object_or_404(Acces_sim, id=request.POST.get('id_acces'))
-        et = get_object_or_404(Etat, id=request.POST.get('id_etat'))
-        sim_models = Sim.objects.create(
-            numero=numeros,
-            adresseIP=adresseIp,
-            operateur=op,
-            acces=ac,
-            etat=et,
-            forfait=forf,
-        )
+        article = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
         collaborateur = Collaborateur.objects.get(matricule=collabo)
         if collaborateur:
-            affectation_sim = Affectation_sim.objects.create(
+            affectation_equipement = Affectation_article.objects.create(
                 collaborateur=collaborateur,
-                sim=sim_models,
                 ticket=num_tickets.first(),
             )
             return redirect('list_affectation_sim')
 
-    return render(request, 'Sim/affectation_siml.html')
+    return render(request, 'Equipement/Affectation/affectation_equipement.html',{'articles': article})
+
+def get_reference(request):
+    article_id = request.GET.get('article_id')  # Correction : utiliser 'collaborateur_id' au lieu de 'collaborateur'
+    try:
+        article = Article_modele.objects.get(id=article_id)  # Correction : utiliser 'id' au lieu de 'collaborateur'
+        data = {
+            'materiel_id': article.materiel,
+        }
+        return JsonResponse(data)
+    except Collaborateur.DoesNotExist:
+        return JsonResponse({'error': 'operateur introuvable'})

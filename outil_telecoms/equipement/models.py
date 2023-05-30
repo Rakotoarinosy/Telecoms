@@ -73,7 +73,7 @@ class Sortie(models.Model):
 
 class Affectation_article(models.Model):
     dateAffectation = models.DateField(verbose_name="Dade d'affectaion",auto_now=True)
-    dateDesactivation = models.DateField(verbose_name="Dade d'affectaion")
+    dateDesactivation = models.DateField(verbose_name="Dade d'affectaion",blank=True,null=True)
     collaborateur = models.ForeignKey(Collaborateur,on_delete=models.SET_NULL,null=True)
     ticket = models.ForeignKey(Ticket,on_delete=models.SET_NULL,null=True)
     article = models.ForeignKey(Article,on_delete=models.SET_NULL,null=True)
