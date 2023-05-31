@@ -1,6 +1,6 @@
 {% extends "base_sim.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Télécoms{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -17,13 +17,13 @@
         </div>
         <div class="row mt-5 mb-5">
             <div class="col">
-                <a href="#">
-                    <h1 class="btn btn-success form-control" style="background: #176F62;">CREATION</h1>
+                <a href="{% url 'reception_stock_equipement_view' %}">
+                    <h1 class="btn btn-success form-control" style="background: #176F62;">RECEPTION</h1>
                 </a>
             </div>
             <div class="col">
-                <a href="#">
-                    <h1 class="btn btn-success form-control" style="background: #176F62;">AFFECTATION SIM</h1>
+                <a href="{% url 'affect_stock_equipement_view' %}">
+                    <h1 class="btn btn-success form-control" style="background: #176F62;">AFFECTATION EQUIPEMENT</h1>
                 </a>
             </div>
             <div class="col">

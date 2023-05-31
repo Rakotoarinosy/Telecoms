@@ -1,0 +1,154 @@
+{% extends 'base_sim.html' %}
+{% block titre1 %}Récéption équipement{% endblock titre1 %}
+{% block content %}
+<form id="format-form" action="{% url 'reception_stock_equipement_view' %}" method="POST" class="tm-contact-form mx-auto">{% csrf_token %}
+  <div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="quantite"><h3>Quantité</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="number" class="form-control" style="width: 100%;" placeholder="Quantite" name="id_quantite" id="id_quantite" autocomplete="off" required>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <input type="hidden" class="form-control" style="width: 100%;" placeholder="id" name="id" id="id" disabled="disabled">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="prix_global"><h3>Prix global</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="number" class="form-control" style="width: 100%;" placeholder="Prix global" name="id_prixglobal" id="id_prixglobal">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="pu_ht"><h3>PU HT</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="number" class="form-control" style="width: 100%;" placeholder="Prix Unitaire Hors Taxe" name="id_pu_ht" id="id_pu_ht">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-6 ">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="num_facture"><h3>Numéro Facture</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" style="width: 100%;" placeholder="Numéro Facture" name="numeroFacture" id="numeroFacture" required>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="dateFacture"><h3>Date facture</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="date" class="form-control" style="width: 100%;" name="dateFacture" id="dateFacture" required>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-6 ">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="reference_bc"><h3>Référence bc</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" style="width: 100%;" placeholder="Référence bc" name="ref_bc" id="ref_bc" required>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="dateBc"><h3>Date BC</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="date" class="form-control" style="width: 100%;" name="dateBc" id="dateBc" required>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="reference"><h3>Référence et modèle d'équipement</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <select class="form-select" id="id_articleReference" name="id_articleReference" required>
+                        <option value=""></option>
+                            {% for article in articles %}
+                                <option value="{{ article.id }}">{{ article.reference_modele }}</option>
+                            {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label" for="materiel"><h3>Type d'équipement</h3></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" name="id_materiel" class="form-control" disabled="disabled" id="id_materiel">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-md-3">
+        <br>
+        <button class="btn btn-success" style="background: #176F62;">Affecter</button>
+    </div>
+  </div>
+</form>
+
+<script>
+    $(document).ready(function() {
+        // Fonction de mise à jour des champs
+        function updatePlafondFields() {
+          var referenceField = $("#id_articleReference");
+          var materielField = $("#id_materiel");
+          var selectedReference = referenceField.val();
+          // Requête AJAX pour récupérer les données du forfait sélectionné
+          $.ajax({
+            url: "{% url 'get_materiel' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
+            data: {
+              article_id: selectedReference  // ID du forfait sélectionné à envoyer au serveur
+            },
+            dataType: "json",
+            success: function(data) {
+              if (data) {
+                materielField.val(data.materiel);
+              } else {
+                materielField.val("");
+              }
+            }
+          });
+        }
+        // Écouteur d'événement pour la modification du champ "forfait"
+        var referenceField = $("#id_articleReference");
+        referenceField.on("change", updatePlafondFields);
+      });
+</script>
+{% endblock content %}

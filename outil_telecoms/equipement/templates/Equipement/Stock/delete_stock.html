@@ -7,7 +7,7 @@
         <div class="col-lg-5 mb-5 mb-lg-0" style="z-index: 10">
             <h1>Supprimer le stock</h1>
 
-            <p>Êtes-vous sûr de vouloir supprimer le stock " <span class="border bg-light m-1">{{ stock }}</span> " ?</p>
+            <p>Êtes-vous sûr de vouloir supprimer le stock " <span class="border bg-light m-1">{{ stock.id }}</span> " ?</p>
 
             <form method="post">
                 {% csrf_token %}

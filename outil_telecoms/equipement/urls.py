@@ -1,10 +1,11 @@
 from django.urls import path
 
-from equipement.views import BcCreateView, BcDeleteView, BcUpdateView, BcView, CreateStockView, ModeleCreateView, ModeleDeleteView, ModeleUpdateView, ModeleView, Reception_articleCreateView, Reception_articleDeleteView, Reception_articleUpdateView, Reception_articleView, Type_equipementCreateView, Type_equipementDeleteView, Type_equipementUpdateView, Type_equipementView, equipement
+from equipement.views import BcCreateView, BcDeleteView, BcUpdateView, BcView, CreateStockView, ModeleCreateView, ModeleDeleteView, ModeleUpdateView, ModeleView, Reception_articleCreateView, Reception_articleDeleteView, Reception_articleUpdateView, Reception_articleView, Type_equipementCreateView, Type_equipementDeleteView, Type_equipementUpdateView, Type_equipementView, affect_stock_equipement_view, equipement, get_materiel, reception_stock_equipement_view, stock_equipement_view
 
 urlpatterns = [
     path('', equipement,name='equipement'),
     path('create-stock/', CreateStockView.as_view(), name='create_stock'),
+    path('get_materiel/', get_materiel, name='get_materiel'),
     #PARAMETRAGE
     ##paramètrage équipement
     ###type_equipement
@@ -27,4 +28,9 @@ urlpatterns = [
     path('create_stock/', Reception_articleCreateView.as_view(),name='create_stock'),
     path('stock/<int:pk>/update/', Reception_articleUpdateView.as_view(), name='update_stock'),
     path('stock/<int:pk>/delete/',Reception_articleDeleteView.as_view(), name='delete_stock'),
+    path('stock_equipement/', stock_equipement_view , name='stock_equipement'),
+    path('affect_equipement/', affect_stock_equipement_view , name='affect_stock_equipement_view'),
+    path('reception_equipement/', reception_stock_equipement_view , name='reception_stock_equipement_view'),
+    
+    
 ]

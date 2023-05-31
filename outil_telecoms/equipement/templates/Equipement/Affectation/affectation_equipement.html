@@ -1,7 +1,7 @@
 {% extends 'base_sim.html' %} 
 {% block titre1 %}AFFECTATION EQUIPEMENT{% endblock titre1 %}
 {% block content %}
-    <form id="format-form" onsubmit="return validerFormulaire();"  action="{% url 'add_affect' %}" method="POST" class="tm-contact-form mx-auto">{% csrf_token %}
+    <form id="format-form" action="{% url 'affect_stock_equipement_view' %}" method="POST" class="tm-contact-form mx-auto">{% csrf_token %}
         {% if message %}
         <p class="alert alert-danger">{{ message }}</p>
         {% endif %}
@@ -90,7 +90,7 @@
             <div class="col-md-6">
                 <div class="row align-items-center">
                     <div class="col-md-4">
-                        <label class="form-label" for="operateur"><h3>Référence et modèle d'équipement</h3></label>
+                        <label class="form-label" for="reference"><h3>Référence et modèle d'équipement</h3></label>
                     </div>
                     <div class="col-md-8">
                         <select class="form-select" id="id_articleReference" name="id_articleReference" required>
@@ -108,7 +108,92 @@
                         <label class="form-label" for="materiel"><h3>Type d'équipement</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" name="id_materiel" class="form-control" disabled="disabled" id="id_materiel">
+                        <input type="text" name="id_materiel" class="form-control" disabled="disabled" id="id_materiel">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 ">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="imei_1"><h3>IMEI 1</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" name="imei_1" id="imei_1" placeholder="IMEI 1" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="imei_2"><h3>IMEI 2</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" name="imei_2" id="imei_2" placeholder="IMEI 2">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-5">
+            <div class="col-md-6 ">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="imei_3"><h3>IMEI 3</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" name="imei_3" id="imei_3" placeholder="IMEI 3">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="imei_14"><h3>IMEI 4</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" name="imei_4" id="imei_4" placeholder="IMEI 4">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="matricule"><h3>Quantité Sortie</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Quantité Sortie" name="matricule" id="matricule" autocomplete="off" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <input type="hidden" class="form-control" style="width: 100%;" placeholder="id" name="id" id="id" disabled="disabled">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3 mb-5">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="nom"><h3>Numéro Bon de Sortie</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="Nom" name="id_nom" id="id_nom" disabled="disabled">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="prenom"><h3>Numéro sortie</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="Prénom(s)" name="id_prenom" id="id_prenom" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -153,6 +238,34 @@
             }
         });
     });
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Fonction de mise à jour des champs
+            function updatePlafondFields() {
+              var referenceField = $("#id_articleReference");
+              var materielField = $("#id_materiel");
+              var selectedReference = referenceField.val();
+              // Requête AJAX pour récupérer les données du forfait sélectionné
+              $.ajax({
+                url: "{% url 'get_materiel' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
+                data: {
+                  article_id: selectedReference  // ID du forfait sélectionné à envoyer au serveur
+                },
+                dataType: "json",
+                success: function(data) {
+                  if (data) {
+                    materielField.val(data.materiel);
+                  } else {
+                    materielField.val("");
+                  }
+                }
+              });
+            }
+            // Écouteur d'événement pour la modification du champ "forfait"
+            var referenceField = $("#id_articleReference");
+            referenceField.on("change", updatePlafondFields);
+          });
     </script>
 
 {% endblock %}

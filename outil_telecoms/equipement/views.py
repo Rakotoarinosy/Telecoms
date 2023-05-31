@@ -1,13 +1,16 @@
-from django.shortcuts import render,redirect
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import DeleteView
 from django.views.generic import TemplateView
 from django.views.generic import ListView
-from django.views import View 
+from django.views import View
+import json
+from sim.models import Collaborateur, Compte_facturation, Etat, Ticket 
 from .forms import BcStockForm
-from .models import Reception_article
+from .models import Affectation_article, Facture, Reception_article
 
 from equipement.forms import BcForm, ModeleForm, StockForm, TypeEquipementForm
 from equipement.models import Article_modele, Bc, Materiel, Reception_article
@@ -34,9 +37,8 @@ class BcCreateView(FormView):
 # class BcListView(ListView):
 #     model = Bc
 #     template_name = 'Equipement/Bc/bc.html'
-#     context_object_name = 'operateurs'
+#     context_object_name = 'articleerateurs'
 
-       
 class BcDeleteView(DeleteView):
     model = Bc
     template_name = 'Equipement/Bc/delete_bc.html'
@@ -192,3 +194,88 @@ class CreateStockView(View):
             return redirect(self.success_url)
 
         return render(request, self.template_name, {'bc_stock_form': bc_stock_form})
+    
+def stock_equipement_view(request):
+    bc = Bc.objects.all()
+    article = Article_modele.objects.all()
+    context = {
+        "bcs": bc,
+        "articles": article,
+    }
+    return render(request, 'Equipement/Stock/stock_equipement.html', context=context)
+
+def affect_stock_equipement_view(request):
+    bc = Bc.objects.all()
+    article = Article_modele.objects.all()
+    if request.method == 'POST':
+        ticket = request.POST.get('numeroTicket')
+        dateDemande = request.POST.get('dateDemande')
+        dateApprobation = request.POST.get('dateApprobation')
+        collabo = request.POST.get('matricule')       
+        tickets = Ticket.objects.filter(numero_ticket=ticket)
+        if not tickets.exists():
+            compte_fact = get_object_or_404(Compte_facturation, id=1)
+            ticket_model = Ticket.objects.create(
+                numero_ticket=ticket,
+                dateDemande=dateDemande,
+                dateApprobation=dateApprobation,
+                compte_facturation=compte_fact,
+            )
+        num_tickets = Ticket.objects.filter(numero_ticket=ticket)
+        article = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
+        collaborateur = Collaborateur.objects.get(matricule=collabo)
+        if collaborateur:
+            affectation_equipement = Affectation_article.objects.create(
+                collaborateur=collaborateur,
+                ticket=num_tickets.first(),
+            )
+            return redirect('list_affectation_sim')
+    return render(request, 'Equipement/Affectation/affectation_equipement.html',{'articles': article})
+
+def reception_stock_equipement_view(request):
+    articles = Article_modele.objects.all()
+    if request.method == 'POST':
+        qt = request.POST.get('id_quantite')
+        pg = request.POST.get('id_prixglobal')
+        pu = request.POST.get('id_pu_ht')
+        facture = request.POST.get('numeroFacture')
+        dateFacture = request.POST.get('dateFacture')
+        bc = request.POST.get('ref_bc')
+        dateBc = request.POST.get('dateBc')
+        facture_ = Facture.objects.filter(num_facture=facture).first()
+        if not facture_:
+            facture_ = Facture.objects.create(
+                num_facture=facture,
+                dateFacture=dateFacture,
+            )
+        bc_ = Bc.objects.filter(reference_bc=bc).first()
+        if not bc_:
+            bc_ = Bc.objects.create(
+                reference_bc=bc,
+                date_bc=dateBc,
+            )
+        reference = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
+        reception = Reception_article.objects.create(
+            quantite=qt,
+            prix_global=pg,
+            pu_ht=pu,
+            bc=bc_,
+            facture=facture_,
+            article_modele=reference,
+        )
+        return redirect('list_affectation_sim')
+    return render(request, 'Equipement/Reception/stock_equipement.html', {'articles': articles})
+
+def get_materiel(request):
+    article_id = request.GET.get('article_id')
+    try:
+        reference = Article_modele.objects.get(id=article_id)
+        materiel = Materiel.objects.get(id=reference.materiel_id)
+
+        data = {
+            'materiel': str(materiel.libelle),
+        }
+        return JsonResponse(data)
+    except Article_modele.DoesNotExist:
+        return JsonResponse({'error': 'Article introuvable'})
+    
