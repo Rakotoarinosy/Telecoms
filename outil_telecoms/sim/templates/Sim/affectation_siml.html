@@ -252,7 +252,8 @@
               }
             }
           });
-      
+          // Vérifier si la valeur du champ "forfait_id" est vide
+          if (selectedForfait) {
           // Requête AJAX pour récupérer les données du forfait sélectionné
           $.ajax({
             url: "{% url 'get_forfait' %}", // L'URL de la vue Django qui renvoie les détails du forfait
@@ -272,7 +273,12 @@
               }
             }
           });
+        }else {
+          montantPlafondVoixField.val("");
+          montantPlafondDataField.val("");
+          typeSim_idField.val("");
         }
+      }
       
         // Écouteur d'événement pour la modification du champ "opérateur"
         var operateurField = $("#id_operateur");

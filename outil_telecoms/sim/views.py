@@ -503,7 +503,7 @@ def get_operateur(request):
             'identifiant': operateur.identifiant,
         }
         return JsonResponse(data)
-    except Collaborateur.DoesNotExist:
+    except Operateur.DoesNotExist:
         return JsonResponse({'error': 'operateur introuvable'})
     
 # Auto complete_forfait_SimCreateView
