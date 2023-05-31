@@ -56,8 +56,6 @@ class StockForm(forms.ModelForm):
     class Meta:
         model = Reception_article
         fields = "__all__"
-        exclude = ['facture',]
-        
         widgets = {
             'quantite' : forms.NumberInput(attrs={'class': 'form-control'}),
             'pu_ht' : forms.NumberInput(attrs={'class': 'form-control'}),
