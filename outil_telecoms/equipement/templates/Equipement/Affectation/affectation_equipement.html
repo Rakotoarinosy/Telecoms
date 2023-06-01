@@ -120,7 +120,7 @@
                         <label class="form-label" for="imei_1"><h3>IMEI 1</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" name="imei_1" id="imei_1" placeholder="IMEI 1" required>
+                        <input type="number" class="form-control" style="width: 100%;" name="imei_1" id="imei_1" placeholder="IMEI 1" required>
                     </div>
                 </div>
             </div>
@@ -130,7 +130,7 @@
                         <label class="form-label" for="imei_2"><h3>IMEI 2</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" name="imei_2" id="imei_2" placeholder="IMEI 2">
+                        <input type="number" class="form-control" style="width: 100%;" name="imei_2" id="imei_2" placeholder="IMEI 2">
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                         <label class="form-label" for="imei_3"><h3>IMEI 3</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" name="imei_3" id="imei_3" placeholder="IMEI 3">
+                        <input type="number" class="form-control" style="width: 100%;" name="imei_3" id="imei_3" placeholder="IMEI 3">
                     </div>
                 </div>
             </div>
@@ -152,7 +152,7 @@
                         <label class="form-label" for="imei_14"><h3>IMEI 4</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" name="imei_4" id="imei_4" placeholder="IMEI 4">
+                        <input type="number" class="form-control" style="width: 100%;" name="imei_4" id="imei_4" placeholder="IMEI 4">
                     </div>
                 </div>
             </div>
@@ -164,7 +164,7 @@
                         <label class="form-label" for="matricule"><h3>Quantité Sortie</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" placeholder="Quantité Sortie" name="matricule" id="matricule" autocomplete="off" required>
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Quantité Sortie" name="quantite" id="quantite" autocomplete="off" required>
                     </div>
                 </div>
             </div>
@@ -176,24 +176,47 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-3 mb-5">
+        <div class="row">
             <div class="col-md-6">
                 <div class="row align-items-center">
                     <div class="col-md-4">
-                        <label class="form-label" for="nom"><h3>Numéro Bon de Sortie</h3></label>
+                        <label class="form-label" for="num_bon_sortie"><h3>Numéro Bon de Sortie</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="Nom" name="id_nom" id="id_nom" disabled="disabled">
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Numéro Bon de Sortie" name="num_bon_sortie" id="num_bon_sortie">
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="row align-items-center">
                     <div class="col-md-4">
-                        <label class="form-label" for="prenom"><h3>Numéro sortie</h3></label>
+                        <label class="form-label" for="num_bon_sortie"><h3>Numéro sortie</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="Prénom(s)" name="id_prenom" id="id_prenom" disabled="disabled">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="Numéro sortie" name="num_sortie" id="num_sortie">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="id_fact"><h3>Numéro facture</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="Numéro facture" name="id_fact" id="id_fact">
+                    </div>
+                    <div id="facture-list"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" for="id_bc"><h3>BC</h3></label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="BC" name="id_bc" id="id_bc" disabled>
                     </div>
                 </div>
             </div>
@@ -266,6 +289,61 @@
             var referenceField = $("#id_articleReference");
             referenceField.on("change", updatePlafondFields);
           });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $("#id_fact").autocomplete({
+              source: function(request, response) {
+                $.ajax({
+                  url: "{% url 'autocomplete_bc' %}",
+                  data: {
+                    num_facture: removeAccents(request.term) // Supprimer les accents du terme de recherche
+                  },
+                  success: function(data) {
+                    var uniqueResults = new Set(); // Utiliser un Set pour stocker les résultats uniques
+                    var filteredData = []; // Stocker les résultats filtrés
+                    
+                    // Filtrer les résultats en supprimant les doublons
+                    data.forEach(function(item) {
+                      var numFacture = removeAccents(item.num_facture); // Supprimer les accents du numéro de facture
+                      if (!uniqueResults.has(numFacture)) {
+                        uniqueResults.add(numFacture);
+                        filteredData.push(item);
+                      }
+                    });
+                    
+                    response(filteredData);
+                  }
+                });
+              },
+              minLength: 1,
+              select: function(event, ui) {
+                // Mettre à jour le champ BC avec la valeur sélectionnée
+                $("#id_bc").val(ui.item.bc);
+                return false;
+              },
+              focus: function(event, ui) {
+                // Afficher le numéro de facture dans le champ de saisie
+                $("#id_fact").val(ui.item.num_facture);
+                return false;
+              },
+              create: function() {
+                // Personnaliser l'affichage des suggestions dans la liste d'autocomplétion
+                $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                  return $("<li>")
+                    .append("<div>" + item.num_facture + "</div>")
+                    .appendTo(ul);
+                };
+              },
+              caseSensitive: false // Rendre la complétion automatique insensible à la casse
+            });
+          });
+          
+          // Fonction pour supprimer les accents d'une chaîne de caractères
+          function removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          }
+          
     </script>
 
 {% endblock %}

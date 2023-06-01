@@ -68,7 +68,7 @@ class Reception_article(models.Model):
 class Sortie(models.Model):
     quantiteSortie = models.IntegerField(verbose_name="Quantité Sortie")
     numBonSortie = models.IntegerField(verbose_name="Numéro Bon de sortie")
-    numSortie = models.IntegerField(verbose_name="Numéro de sortie")
+    numSortie = models.CharField(verbose_name="Numéro de sortie")
     reception_article = models.ForeignKey(Reception_article,on_delete=models.SET_NULL,null=True)
 
 class Affectation_article(models.Model):

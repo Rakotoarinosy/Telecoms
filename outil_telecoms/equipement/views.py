@@ -10,10 +10,11 @@ from django.views import View
 import json
 from sim.models import Collaborateur, Compte_facturation, Etat, Ticket 
 from .forms import BcStockForm
-from .models import Affectation_article, Facture, Reception_article
+from .models import Affectation_article, Article, Facture, Reception_article, Sortie
 
 from equipement.forms import BcForm, ModeleForm, StockForm, TypeEquipementForm
 from equipement.models import Article_modele, Bc, Materiel, Reception_article
+from unidecode import unidecode
 # Create your views here.
 
 def equipement(request):
@@ -211,7 +212,15 @@ def affect_stock_equipement_view(request):
         ticket = request.POST.get('numeroTicket')
         dateDemande = request.POST.get('dateDemande')
         dateApprobation = request.POST.get('dateApprobation')
-        collabo = request.POST.get('matricule')       
+        collabo = request.POST.get('matricule')
+        imei_1 = request.POST.get('imei_1')
+        imei_2 = request.POST.get('imei_2')
+        imei_3 = request.POST.get('imei_3')
+        imei_4 = request.POST.get('imei_4')
+        quantiteSortie = request.POST.get('quantite')
+        numBonSortie = request.POST.get('num_bon_sortie')
+        numSortie = request.POST.get('num_sortie')
+        fact = request.POST.get('id_fact')
         tickets = Ticket.objects.filter(numero_ticket=ticket)
         if not tickets.exists():
             compte_fact = get_object_or_404(Compte_facturation, id=1)
@@ -221,13 +230,32 @@ def affect_stock_equipement_view(request):
                 dateApprobation=dateApprobation,
                 compte_facturation=compte_fact,
             )
+        eta = get_object_or_404(Etat, id=1)
         num_tickets = Ticket.objects.filter(numero_ticket=ticket)
-        article = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
+        article_affect = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
+        article_ = Article.objects.create(
+            imei1 = imei_1,
+            imei2 = imei_2,
+            imei3 = imei_3,
+            imei4 = imei_4,
+            etat = eta,
+            article_modele = article_affect,
+        )
+        id_fact = Facture.objects.filter(num_facture=fact).values_list('id', flat=True)
+        reception_article = Reception_article.objects.filter(id=id_fact[0]).first()
+        sortie_ = Sortie.objects.create(
+            quantiteSortie = quantiteSortie,
+            numBonSortie = numBonSortie,
+            numSortie = numSortie,
+            reception_article = reception_article,
+        )   
         collaborateur = Collaborateur.objects.get(matricule=collabo)
         if collaborateur:
             affectation_equipement = Affectation_article.objects.create(
-                collaborateur=collaborateur,
+                collaborateur = collaborateur,
                 ticket=num_tickets.first(),
+                article = article_,
+                sortie = sortie_,
             )
             return redirect('list_affectation_sim')
     return render(request, 'Equipement/Affectation/affectation_equipement.html',{'articles': article})
@@ -279,3 +307,12 @@ def get_materiel(request):
     except Article_modele.DoesNotExist:
         return JsonResponse({'error': 'Article introuvable'})
     
+def autocomplete_bc(request):
+    num_facture = request.GET.get("num_facture", "")
+    try:
+        reception_articles = Reception_article.objects.filter(facture__num_facture__istartswith=num_facture)
+        data = [{"num_facture": reception_article.facture.num_facture, "bc": reception_article.bc.reference_bc} for reception_article in reception_articles]
+    except (Facture.DoesNotExist, Reception_article.DoesNotExist):
+        data = []
+
+    return JsonResponse(data, safe=False)
