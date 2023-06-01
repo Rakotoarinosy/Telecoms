@@ -51,9 +51,9 @@ class Article_modele(models.Model):
 
 class Article(models.Model):
     imei1 = models.IntegerField(verbose_name="IMEI 1")
-    imei2 = models.IntegerField(verbose_name="IMEI 2",blank=False,null=True)
-    imei3 = models.IntegerField(verbose_name="IMEI 3",blank=False,null=True)
-    imei4 = models.IntegerField(verbose_name="IMEI 4",blank=False,null=True)
+    imei2 = models.IntegerField(verbose_name="IMEI 2",blank=True,null=True)
+    imei3 = models.IntegerField(verbose_name="IMEI 3",blank=True,null=True)
+    imei4 = models.IntegerField(verbose_name="IMEI 4",blank=True,null=True)
     etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True)
     article_modele = models.ForeignKey(Article_modele,on_delete=models.SET_NULL,null=True)
 
