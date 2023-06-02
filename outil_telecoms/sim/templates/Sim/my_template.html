@@ -1,0 +1,99 @@
+{% extends '../base_sim.html' %} 
+{% block content %}
+<form method="post" action="{% url 'complet' %}">
+    {% csrf_token %}
+    {{ Ticket_form.as_p }}
+    {{ Sim_form.as_p }}
+    {{ AffectationSim_form.as_p }}
+
+    {% if Sim_form.errors %}
+    <div class="alert alert-danger">
+      <strong>Erreurs :</strong>
+      <ul>
+        {% for field_errors in form.errors.values %}
+          {% for error in field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+    <button class="btn btn-success" style="background: #176F62;" type="submit">Envoyer</button>
+</form>
+<script>
+    $(document).ready(function() {
+      // Fonction de mise à jour des champs
+      function updatePlafondFields() {
+        var forfaitField = $("#id_forfait");
+        var montantPlafondVoixField = $("#id_montantPlafondVoix");
+        var montantPlafondDataField = $("#id_montantPlafondData");
+        var plafondInterneField = $("#id_plafondInterne");
+        var typeSim_idField = $("#id_typeSim_id");
+        
+        var selectedForfait = forfaitField.val();
+        
+        // Requête AJAX pour récupérer les données du forfait sélectionné
+        $.ajax({
+          url: "{% url 'get_forfait' %}",  // L'URL de la vue Django qui renvoie les détails du forfait
+          data: {
+            forfait_id: selectedForfait  // ID du forfait sélectionné à envoyer au serveur
+          },
+          dataType: "json",
+          success: function(data) {
+            if (data) {
+              montantPlafondVoixField.val(data.montantPlafondVoix);
+              montantPlafondDataField.val(data.montantPlafondData);
+              plafondInterneField.val(data.plafondInterne);
+              typeSim_idField.val(data.typeSim_id);
+            } else {
+              montantPlafondVoixField.val("");
+              montantPlafondDataField.val("");
+              plafondInterneField.val("");
+              typeSim_idField.val("");
+            }
+          }
+        });
+      }
+      
+      // Écouteur d'événement pour la modification du champ "forfait"
+      var forfaitField = $("#id_forfait");
+      forfaitField.on("change", updatePlafondFields);
+    });
+</script>
+<script>
+  
+  $(document).ready(function() {
+    $('#matricule').autocomplete({
+      source: function(request, response) {
+        var matricule = request.term;
+        console.log(matricule);
+        $.ajax({
+          url: "{% url 'get_collaborateur' %}",
+          data: {
+            'matricule': matricule
+          },
+          dataType: 'json',
+          success: function(data) {
+            response($.map(data.response, function(item) {
+              return {
+                value : item.matricule,
+                label: item.nom,
+                label1: item.prenom,
+              };
+            }));
+          }
+        });
+      },
+      minLength: 1,
+      select: function(event, ui) {
+        var collaborateur = ui.item;
+        $('#matricule').val(collaborateur.value);
+        $('#id_nom').val(collaborateur.label);
+        $('#id_prenom').val(collaborateur.label1);
+      }
+    });
+  });
+  
+   
+</script>
+{% endblock content %}

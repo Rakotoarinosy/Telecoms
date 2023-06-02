@@ -1,0 +1,26 @@
+
+{% extends '../base_sim.html' %}
+
+{% block content %}
+
+<div class="col-lg-6 mb-5 mb-lg-0 offset-1">
+  <div class="card-body">
+    <table id="profil" class=" table ">
+      <thead>
+          <tr>
+              <th>id</th>
+              <th>Type de profil</th>
+          </tr>
+      </thead>
+      {% for division in divisions %}
+      <tbody>
+          <tr>
+              <td>{{ division.id }}</td>
+              <td>{{ division.libelle }}</td>
+          </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock content %}

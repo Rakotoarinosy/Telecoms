@@ -1,0 +1,36 @@
+{% extends 'base_index.html' %} {% block title %}HOME{% endblock %} {% block content %}
+
+
+<div class="container">
+    <div class="row center-block">
+        <div class="row align-items-center mb-5">
+            <h1>
+                <center>OUTIL DE SUIVI DE MATERIELS ET DE LIGNES DE TELECOMMUNICATION</center>
+            </h1>
+        </div>
+        <div class="row">
+            <h1><center>{% block titre %}{% endblock titre %}</center></h1>
+        </div>
+        <div class="row mt-5">
+            {% block menu %}
+                <div class="col">
+                    <a href="{% url 'equipement' %}">
+                        <h1 class="btn btn-success form-control" style="background: #176F62;">EQUIPEMENT</h1>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="{% url 'sim' %}">
+                        <h1 class="btn btn-success form-control" style="background: #176F62;">SIM</h1>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="{% url 'parametrage' %}">
+                        <h1 class="btn btn-success form-control" style="background: #176F62;">PARAMETRAGE</h1>
+                    </a>
+                </div>
+            {% endblock menu %}
+        </div>
+
+    </div>
+</div>
+{% endblock%}
