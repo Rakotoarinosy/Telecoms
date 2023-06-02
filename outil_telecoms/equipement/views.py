@@ -260,6 +260,72 @@ def affect_stock_equipement_view(request):
             return redirect('list_affectation_sim')
     return render(request, 'Equipement/Affectation/affectation_equipement.html',{'articles': article})
 
+class AffectationListView(ListView):
+    model = Affectation_article
+    template_name = 'Equipement/Affectation/list_affectation_equipement.html'
+    context_object_name = 'affectationEquipements'
+
+    
+def update_stock_equipement_view(request, id_affectation):
+    affectation = get_object_or_404(Affectation_article, id=id_affectation)
+    bc = Bc.objects.all()
+    article = Article_modele.objects.all()
+
+    if request.method == 'POST':
+        ticket = request.POST.get('numeroTicket')
+        dateDemande = request.POST.get('dateDemande')
+        dateApprobation = request.POST.get('dateApprobation')
+        collabo = request.POST.get('matricule')
+        imei_1 = request.POST.get('imei_1')
+        imei_2 = request.POST.get('imei_2')
+        imei_3 = request.POST.get('imei_3')
+        imei_4 = request.POST.get('imei_4')
+        quantiteSortie = request.POST.get('quantite')
+        numBonSortie = request.POST.get('num_bon_sortie')
+        numSortie = request.POST.get('num_sortie')
+        fact = request.POST.get('id_fact')
+        tickets = Ticket.objects.filter(numero_ticket=ticket)
+        if not tickets.exists():
+            compte_fact = get_object_or_404(Compte_facturation, id=1)
+            ticket_model = Ticket.objects.create(
+                numero_ticket=ticket,
+                dateDemande=dateDemande,
+                dateApprobation=dateApprobation,
+                compte_facturation=compte_fact,
+            )
+        eta = get_object_or_404(Etat, id=1)
+        num_tickets = Ticket.objects.filter(numero_ticket=ticket)
+        article_affect = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
+        article_ = Article.objects.create(
+            imei1 = imei_1,
+            imei2 = imei_2,
+            imei3 = imei_3,
+            imei4 = imei_4,
+            etat = eta,
+            article_modele = article_affect,
+        )
+        id_fact = Facture.objects.filter(num_facture=fact).values_list('id', flat=True)
+        reception_article = Reception_article.objects.filter(id=id_fact[0]).first()
+        sortie_ = Sortie.objects.create(
+            quantiteSortie = quantiteSortie,
+            numBonSortie = numBonSortie,
+            numSortie = numSortie,
+            reception_article = reception_article,
+        )   
+        collaborateur = Collaborateur.objects.get(matricule=collabo)
+        if collaborateur:
+            affectation_equipement = Affectation_article.objects.create(
+                collaborateur = collaborateur,
+                ticket=num_tickets.first(),
+                article = article_,
+                sortie = sortie_,
+            )
+
+        return redirect('list_affectation_sims')
+
+    return render(request, 'Equipement/Affectation/affectation_edit.html', {'affectation': affectation, 'articles': article})
+
+
 def reception_stock_equipement_view(request):
     articles = Article_modele.objects.all()
     if request.method == 'POST':

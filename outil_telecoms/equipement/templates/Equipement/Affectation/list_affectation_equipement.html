@@ -1,0 +1,80 @@
+{% extends 'base_sim.html' %}
+{% block titre1 %}LISTE DES AFFECTATION D'EQUIPEMENT{% endblock titre1 %}
+{% block content %} 
+<div style="overflow-y: auto;">
+      <table id="profil" class="table data-table">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Matricule</th>
+                <th>Nom</th>
+                <th>Prénom(s)</th>
+                <th>N° FACTURE</th>
+                <th>DATE FACTURE</th>
+                <th>BC</th>
+                <th>DATE BC</th>
+                <th>IMEI1</th>
+                <th>ARTICLE</th>
+                <th>Model et Ref</th>
+                <th>Catégorie</th>
+                <th>Qté Sortie</th>
+                <th>PU HT en Ar</th>
+                <th>Prix Global en Ar HT</th>
+                <th>TICKET</th>
+                <th>Date demande</th>
+                <th>Date d'approbation</th>
+                <th>Date d affectation</th>
+                <th>Num Bon de sortie</th>
+                <th>Numéro de sortie </th>
+                <th>CODE ANALYTIQUE</th>
+                <th>N° MATRIULE</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Fonction</th>
+                <th>Département</th>
+                <th>SITE</th>
+                <th>DIVISION</th>
+                <th>MOIS D'AFFECTATION</th>
+                <th>Modification</th>
+            </tr>
+        </thead>
+          <tbody>
+            {% for affectationEquipement in affectationEquipements %}
+            <tr>
+                <td>{{affectationEquipement.id}}</td>
+                <td>{{affectationEquipement.collaborateur.matricule}}</td>
+                <td>{{affectationEquipement.collaborateur.nom}}</td>
+                <td>{{affectationEquipement.collaborateur.prenom}}</td>
+                <td>{{affectationEquipement.sortie.reception_article.facture}}</td>
+                <td>{{affectationEquipement.sortie.reception_article.facture.dateFacture}}</td>
+                <td>{{affectationEquipement.sortie.reception_article.bc.reference_bc}}</td>
+                <td>{{affectationEquipement.sortie.reception_article.bc.date_bc}}</td>
+                <td>{{affectationEquipement.article.imei1}}</td>
+                <td>{{affectationEquipement.article.article_modele.materiel}}</td>
+                <td>{{affectationEquipement.article.article_modele}}</td>
+                <td>{{affectationEquipement.article.article_modele.materiel.code_analytique.categorie}}</td>
+                <td>{{affectationEquipement.sortie.quantiteSortie}}</td>
+                <td>{{affectationEquipement.sortie.reception_article.pu_ht}}</td>
+                <td>{{affectationEquipement.sortie.reception_article.prix_global}}</td>
+                <td>{{affectationEquipement.ticket.numero_ticket}}</td>
+                <td>{{affectationEquipement.ticket.dateDemande}}</td>
+                <td>{{affectationEquipement.ticket.dateApprobation}}</td>
+                <td>{{affectationEquipement.dateAffectation}}</td>
+                <td>{{affectationEquipement.sortie.numBonSortie}}</td>
+                <td>{{affectationEquipement.sortie.numSortie}}</td>
+                <td>{{affectationEquipement.article.article_modele.materiel.code_analytique}}</td>
+                <td>{{affectationEquipement.dateDesactivation}}</td>
+                <td>{{affectationEquipement.}}</td>
+                <td>{{affectationEquipement.}}</td>
+                <td>{{affectationEquipement.}}</td>
+                <td>{{affectationEquipement.}}</td>
+                <td>{{affectationEquipement.}}</td>
+                <td>{{affectationEquipement.}}</td>
+                <td>{{affectationEquipement.}}</td>
+                <td><a href="#"><i class="bi bi-pen align-items-center"></i></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+{% endblock content %}
