@@ -64,7 +64,7 @@ class Profil(models.Model):
         return str(self.libelle)
 
 class Collaborateur(models.Model):
-    matricule = models.CharField(unique=True,verbose_name="Matricule")
+    matricule = models.CharField(unique=True,verbose_name="Matricule",max_length=20)
     nom = models.CharField(max_length=150,verbose_name="Nom")
     prenom = models.CharField(max_length=150,verbose_name="Prénoms")
     fonction = models.CharField(max_length=150,verbose_name="Fonction")
@@ -109,7 +109,7 @@ class Forfait(models.Model):
         
 class Sim(models.Model):
     numero = models.IntegerField(verbose_name="Numéro Téléphone")
-    adresseIP = models.CharField(verbose_name="Adresse IP",blank=True,null=True)
+    adresseIP = models.CharField(verbose_name="Adresse IP",blank=True,null=True,max_length=20)
     operateur = models.ForeignKey(Operateur,on_delete=models.SET_NULL,null=True,verbose_name="Opérateur")
     acces = models.ForeignKey(Acces_sim,on_delete=models.SET_NULL,null=True,verbose_name="Accès")
     etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True,verbose_name="Etat")

@@ -9,7 +9,7 @@
 {% block content %}
     <div class="col-lg-6 mb-5 mb-lg-0 ">
       <div class="card-body ">
-        <table id="profil" class="table">
+        <table id="profil" class="table data-table">
             <thead>
               <tr>
                 <th>id</th>
@@ -36,9 +36,4 @@
     <div class="col-lg-5 mb-5 mb-lg-0 offset-1" style="z-index: 10">
         <a class="btn btn-success" href="{% url 'create_profil' %}" style="background: #176F62;">Ajout d'un nouveau profil</a>
     </div>
-<script type="text/javascript" class="init">
-    $(document).ready(function() {
-        $('#profil').DataTable();
-    });
-</script>
 {% endblock content %}

@@ -114,21 +114,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                <label class="form-label" for="etat"><h3>Etat</h3></label>
-                </div>
-                <div class="col-md-8">
-                <select class="form-select" style="width: 100%;" name="id_etat" id="id_etat" required>
-                    <option value=""></option>
-                    {% for etat in etats %}
-                    <option value="{{ etat.id }}">{{ etat.libelle }}</option>
-                    {% endfor %}
-                </select>
-                </div>
-            </div>
-            </div>
+            
             <div class="col-md-6">
             <div class="row align-items-center">
                 <div class="col-md-4">

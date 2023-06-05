@@ -455,7 +455,8 @@ def affect_sim(request):
         forf = get_object_or_404(Forfait, id=request.POST.get('id_forfait'))
         op = get_object_or_404(Operateur, id=request.POST.get('id_operateur'))
         ac = get_object_or_404(Acces_sim, id=request.POST.get('id_acces'))
-        et = get_object_or_404(Etat, id=request.POST.get('id_etat'))
+        #et = get_object_or_404(Etat, id=request.POST.get('id_etat'))
+        et = Etat.objects.get(libelle= 'Actif')
         sim_models = Sim.objects.create(
             numero=numeros,
             adresseIP=adresseIp,

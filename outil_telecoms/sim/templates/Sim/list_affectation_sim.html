@@ -2,7 +2,7 @@
 {% block titre1 %}LISTE DES SIM{% endblock titre1 %}
 {% block content %}
 <div class="table-container">
-      <table id="profil" class="table">
+      <table id="profil" class="table data-table">
           <thead>
             <tr>
               <th>id</th>
@@ -24,8 +24,8 @@
               <th>Modifier</th>
             </tr>
           </thead>
-          {% for affectationSim in affectationSims %}
           <tbody>
+            {% for affectationSim in affectationSims %}
             <tr>
               <td>{{ affectationSim.id }}</td>
               <td>{{ affectationSim.collaborateur.matricule}}</td>
@@ -45,13 +45,9 @@
               <td>{{ affectationSim.acces }}</td>
               <td><a href="{% url 'update_affectation_sim' pk=affectationSim.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
             </tr>
+            {% endfor %}
           </tbody>
-          {% endfor %}
       </table>
 </div>
-<script type="text/javascript" class="init">
-  $(document).ready(function() {
-      $('#profil').DataTable();
-  });
-</script>
+
 {% endblock content %}
