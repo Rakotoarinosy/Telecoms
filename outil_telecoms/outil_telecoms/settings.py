@@ -89,15 +89,14 @@ WSGI_APPLICATION = 'outil_telecoms.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'outil',
-        'USER': 'basan',
-        'PASSWORD': 'Cosf@005!',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'telecom', 
+        'USER': 'devuser', 
+        'PASSWORD': 'devsecret',
+        'HOST': 'tnrlecsrvapp23', 
+        'PORT': '54322',
     }
 }
-
 
 
 # Password validation
@@ -135,7 +134,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES = os.path.join(BASE_DIR,"")
+STATIC_FILES = [
+    os.path.join(BASE_DIR,"outil_telecoms/static/")
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
