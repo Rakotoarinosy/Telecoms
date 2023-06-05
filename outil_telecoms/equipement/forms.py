@@ -88,3 +88,8 @@ class BcStockForm(forms.ModelForm):
         if existing_bc:
             raise forms.ValidationError("Ce bon de commande existe déjà.")
         return cleaned_bc
+    
+class AffectationArticleForm(forms.Form):
+    class Meta:
+        model = Affectation_article
+        fields = "__all__"

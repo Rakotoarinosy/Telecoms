@@ -1,11 +1,11 @@
 {% extends 'base_sim.html' %} 
 {% block titre1 %}AFFECTATION EQUIPEMENT{% endblock titre1 %}
 {% block content %}
-    <form id="format-form" action="{% url 'affect_stock_equipement_view' %}" method="POST" class="tm-contact-form mx-auto">{% csrf_token %}
+    <form id="format-form" action="{% url 'affectation_update' affectationEquipement.id %}" method="POST" class="tm-contact-form mx-auto">{% csrf_token %}
         {% if message %}
         <p class="alert alert-danger">{{ message }}</p>
         {% endif %}
-    
+        <input  type="hidden" name="objet_id" value="{{ affectationEquipement.id }}">
       <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -14,14 +14,14 @@
                         <label class="form-label" for="matricule"><h3>Matricule</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" placeholder="Matricule" name="matricule" id="matricule" autocomplete="off" required>
+                        <input type="number" class="form-control" style="width: 100%;" placeholder="Matricule" name="matricule" id="matricule" autocomplete="off" value="{{affectationEquipement.collaborateur.matricule}}" required>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <input type="hidden" class="form-control" style="width: 100%;" placeholder="id" name="id" id="id" disabled="disabled">
+                        <input value="{{affectationEquipement.collaborateur.nom}}" type="hidden" class="form-control" style="width: 100%;" placeholder="id" name="id" id="id" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                         <label class="form-label" for="nom"><h3>Nom</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="Nom" name="id_nom" id="id_nom" disabled="disabled">
+                        <input value="{{affectationEquipement.collaborateur.nom}}" type="text" class="form-control" style="width: 100%;" placeholder="Nom" name="id_nom" id="id_nom" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                         <label class="form-label" for="prenom"><h3>Prénom(s)</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="Prénom(s)" name="id_prenom" id="id_prenom" disabled="disabled">
+                        <input value="{{affectationEquipement.collaborateur.prenom}}" type="text" class="form-control" style="width: 100%;" placeholder="Prénom(s)" name="id_prenom" id="id_prenom" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                         <label class="form-label" for="num_ticket"><h3>Numéro de ticket</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" placeholder="Numéro du ticket" name="numeroTicket" id="numeroTicket" required>
+                        <input value="{{affectationEquipement.ticket.numero_ticket}}" type="number" class="form-control" style="width: 100%;" placeholder="Numéro du ticket" name="numeroTicket" id="numeroTicket" disabled required>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
                         <label class="form-label" for="num_ticket"><h3>Date de demande</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="date" class="form-control" style="width: 100%;" name="dateDemande" id="dateDemande" required>
+                        <input value="{{affectationEquipement.ticket.dateDemande}}" type="text" class="form-control" style="width: 100%;" name="dateDemande" id="dateDemande" required disabled>
                     </div>
                 </div>
             </div>
@@ -81,7 +81,7 @@
                         <label class="form-label" for="num_ticket"><h3>Date d'approbation</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="date" class="form-control" style="width: 100%;" name="dateApprobation" id="dateApprobation" required>
+                        <input value="{{affectationEquipement.ticket.dateApprobation}}" type="text" class="form-control" style="width: 100%;" name="dateApprobation" id="dateApprobation" required disabled>
                     </div>
                 </div>
             </div>
@@ -93,12 +93,7 @@
                         <label class="form-label" for="reference"><h3>Référence et modèle d'équipement</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <select class="form-select" id="id_articleReference" name="id_articleReference" required>
-                            <option value=""></option>
-                                {% for article in articles %}
-                                    <option value="{{ article.id }}">{{ article.reference_modele }}</option>
-                                {% endfor %}
-                        </select>
+                        <input value="{{affectationEquipement.article.article_modele}}" type="text" class="form-control" id="id_articleReference" name="id_articleReference" disabled required>
                     </div>
                 </div>
             </div>
@@ -108,7 +103,7 @@
                         <label class="form-label" for="materiel"><h3>Type d'équipement</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" name="id_materiel" class="form-control" disabled="disabled" id="id_materiel">
+                        <input value="{{affectationEquipement.article.article_modele.materiel}}" type="text" name="id_materiel" class="form-control" disabled="disabled" id="id_materiel">
                     </div>
                 </div>
             </div>
@@ -120,7 +115,7 @@
                         <label class="form-label" for="imei_1"><h3>IMEI 1</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" name="imei_1" id="imei_1" placeholder="IMEI 1" required>
+                        <input value="{{affectationEquipement.article.imei1}}" type="number" class="form-control" style="width: 100%;" name="imei_1" id="imei_1" placeholder="IMEI 1" required disabled>
                     </div>
                 </div>
             </div>
@@ -130,7 +125,7 @@
                         <label class="form-label" for="imei_2"><h3>IMEI 2</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" name="imei_2" id="imei_2" placeholder="IMEI 2">
+                        <input value="{{affectationEquipement.article.imei2}}" type="number" class="form-control" style="width: 100%;" name="imei_2" id="imei_2" placeholder="IMEI 2" disabled>
                     </div>
                 </div>
             </div>
@@ -142,7 +137,7 @@
                         <label class="form-label" for="imei_3"><h3>IMEI 3</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" name="imei_3" id="imei_3" placeholder="IMEI 3">
+                        <input value="{{affectationEquipement.article.imei3}}" type="number" class="form-control" style="width: 100%;" name="imei_3" id="imei_3" placeholder="IMEI 3" disabled>
                     </div>
                 </div>
             </div>
@@ -152,7 +147,7 @@
                         <label class="form-label" for="imei_14"><h3>IMEI 4</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" name="imei_4" id="imei_4" placeholder="IMEI 4">
+                        <input value="{{affectationEquipement.article.imei4}}" type="number" class="form-control" style="width: 100%;" name="imei_4" id="imei_4" placeholder="IMEI 4" disabled>
                     </div>
                 </div>
             </div>
@@ -164,14 +159,14 @@
                         <label class="form-label" for="matricule"><h3>Quantité Sortie</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" placeholder="Quantité Sortie" name="quantite" id="quantite" autocomplete="off" required>
+                        <input value="{{affectationEquipement.sortie.quantiteSortie}}" type="number" class="form-control" style="width: 100%;" placeholder="Quantité Sortie" name="quantite" id="quantite" autocomplete="off" disabled="disabled" required>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <input type="hidden" class="form-control" style="width: 100%;" placeholder="id" name="id" id="id" disabled="disabled">
+                        <input value="" type="hidden" class="form-control" style="width: 100%;" placeholder="id" name="id" id="id" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -183,7 +178,7 @@
                         <label class="form-label" for="num_bon_sortie"><h3>Numéro Bon de Sortie</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" style="width: 100%;" placeholder="Numéro Bon de Sortie" name="num_bon_sortie" id="num_bon_sortie">
+                        <input value="{{affectationEquipement.sortie.numBonSortie}}" type="number" class="form-control" style="width: 100%;" placeholder="Numéro Bon de Sortie" name="num_bon_sortie" id="num_bon_sortie" disabled>
                     </div>
                 </div>
             </div>
@@ -193,7 +188,7 @@
                         <label class="form-label" for="num_bon_sortie"><h3>Numéro sortie</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="Numéro sortie" name="num_sortie" id="num_sortie">
+                        <input value="{{affectationEquipement.sortie.numBonSortie}}" type="text" class="form-control" style="width: 100%;" placeholder="Numéro sortie" name="num_sortie" id="num_sortie" disabled>
                     </div>
                 </div>
             </div>
@@ -205,7 +200,7 @@
                         <label class="form-label" for="id_fact"><h3>Numéro facture</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="Numéro facture" name="id_fact" id="id_fact">
+                        <input value="{{affectationEquipement.sortie.reception_article.facture}}" type="text" class="form-control" style="width: 100%;" placeholder="Numéro facture" name="id_fact" id="id_fact" disabled>
                     </div>
                     <div id="facture-list"></div>
                 </div>
@@ -216,7 +211,7 @@
                         <label class="form-label" for="id_bc"><h3>BC</h3></label>
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="BC" name="id_bc" id="id_bc" disabled>
+                        <input value="{{affectationEquipement.sortie.reception_article.bc.reference_bc}}" type="text" class="form-control" style="width: 100%;" placeholder="BC" name="id_bc" id="id_bc" disabled>
                     </div>
                 </div>
             </div>

@@ -68,8 +68,10 @@ class Reception_article(models.Model):
 class Sortie(models.Model):
     quantiteSortie = models.IntegerField(verbose_name="Quantité Sortie")
     numBonSortie = models.IntegerField(verbose_name="Numéro Bon de sortie")
-    numSortie = models.CharField(verbose_name="Numéro de sortie")
+    numSortie = models.CharField(verbose_name="Numéro de sortie",max_length=200)
     reception_article = models.ForeignKey(Reception_article,on_delete=models.SET_NULL,null=True)
+    def __str__(self):
+        return str(self.quantiteSortie)
 
 class Affectation_article(models.Model):
     dateAffectation = models.DateField(verbose_name="Dade d'affectaion",auto_now=True)
@@ -82,3 +84,11 @@ class Affectation_article(models.Model):
 class Article_sim(models.Model):
     affectation_article = models.ForeignKey(Affectation_article,on_delete=models.SET_NULL,null=True)
     sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True)    
+
+
+class Mouvement(models.Model):
+     disponible=  models.IntegerField(verbose_name="Disponible")
+     inactif=  models.IntegerField(verbose_name="Inactif")
+     affecte=  models.IntegerField(verbose_name="Affecte")
+     article_modele = models.ForeignKey(Article_modele,on_delete=models.SET_NULL,null=True)
+     

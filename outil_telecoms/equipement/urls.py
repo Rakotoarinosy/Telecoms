@@ -1,6 +1,6 @@
 from django.urls import path
 
-from equipement.views import AffectationListView, BcCreateView, BcDeleteView, BcUpdateView, BcView, CreateStockView, ModeleCreateView, ModeleDeleteView, ModeleUpdateView, ModeleView, Reception_articleCreateView, Reception_articleDeleteView, Reception_articleUpdateView, Reception_articleView, Type_equipementCreateView, Type_equipementDeleteView, Type_equipementUpdateView, Type_equipementView, affect_stock_equipement_view, autocomplete_bc, equipement, get_materiel, reception_stock_equipement_view, stock_equipement_view, update_stock_equipement_view
+from equipement.views import AffectationArticleUpdateView, AffectationListView, BcCreateView, BcDeleteView, BcUpdateView, BcView, CreateStockView, ModeleCreateView, ModeleDeleteView, ModeleUpdateView, ModeleView, Reception_articleCreateView, Reception_articleDeleteView, Reception_articleUpdateView, Reception_articleView, Type_equipementCreateView, Type_equipementDeleteView, Type_equipementUpdateView, Type_equipementView, affect_stock_equipement_view, affectation_update_view, autocomplete_bc, equipement, get_materiel, reception_stock_equipement_view, stock_equipement_view, update_stock_equipement_view
 
 urlpatterns = [
     path('', equipement,name='equipement'),
@@ -33,7 +33,9 @@ urlpatterns = [
     path('reception_equipement/', reception_stock_equipement_view , name='reception_stock_equipement_view'),
     path('autocomplete_bc/', autocomplete_bc ,name='autocomplete_bc'),
     path('affectations/update/<int:id_affectation>/', update_stock_equipement_view , name='update_affectation'),
-    path('affectations/', AffectationListView.as_view(), name='affectation_list'),
+    path('affectation_list/', AffectationListView.as_view(), name='affectation_list'),
+    path('affectation_update/<int:pk>/', AffectationArticleUpdateView.as_view(), name='affectation_update'),
+    path('affectation/update/<int:affectation_id>/', affectation_update_view, name='affectation_update'),
 
     
 ]

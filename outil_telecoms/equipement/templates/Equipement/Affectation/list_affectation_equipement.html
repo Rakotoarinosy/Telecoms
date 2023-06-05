@@ -1,7 +1,7 @@
 {% extends 'base_sim.html' %}
 {% block titre1 %}LISTE DES AFFECTATION D'EQUIPEMENT{% endblock titre1 %}
 {% block content %} 
-<div style="overflow-y: auto;">
+<div style=" overflow-y: auto; white-space: nowrap;">
       <table id="profil" class="table data-table">
         <thead>
             <tr>
@@ -27,14 +27,7 @@
                 <th>Num Bon de sortie</th>
                 <th>Numéro de sortie </th>
                 <th>CODE ANALYTIQUE</th>
-                <th>N° MATRIULE</th>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Fonction</th>
-                <th>Département</th>
-                <th>SITE</th>
-                <th>DIVISION</th>
-                <th>MOIS D'AFFECTATION</th>
+                <th>Date de Desactivation</th>
                 <th>Modification</th>
             </tr>
         </thead>
@@ -64,14 +57,7 @@
                 <td>{{affectationEquipement.sortie.numSortie}}</td>
                 <td>{{affectationEquipement.article.article_modele.materiel.code_analytique}}</td>
                 <td>{{affectationEquipement.dateDesactivation}}</td>
-                <td>{{affectationEquipement.}}</td>
-                <td>{{affectationEquipement.}}</td>
-                <td>{{affectationEquipement.}}</td>
-                <td>{{affectationEquipement.}}</td>
-                <td>{{affectationEquipement.}}</td>
-                <td>{{affectationEquipement.}}</td>
-                <td>{{affectationEquipement.}}</td>
-                <td><a href="#"><i class="bi bi-pen align-items-center"></i></a></td>
+                <td><a href="{% url 'affectation_update' affectation_id=affectationEquipement.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
             </tr>
             {% endfor %}
           </tbody>

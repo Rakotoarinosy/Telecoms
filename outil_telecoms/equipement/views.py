@@ -9,8 +9,8 @@ from django.views.generic import ListView
 from django.views import View
 import json
 from sim.models import Collaborateur, Compte_facturation, Etat, Ticket 
-from .forms import BcStockForm
-from .models import Affectation_article, Article, Facture, Reception_article, Sortie
+from .forms import AffectationArticleForm, BcStockForm
+from .models import Affectation_article, Article, Facture, Reception_article, Sortie, Mouvement
 
 from equipement.forms import BcForm, ModeleForm, StockForm, TypeEquipementForm
 from equipement.models import Article_modele, Bc, Materiel, Reception_article
@@ -222,6 +222,7 @@ def affect_stock_equipement_view(request):
         numSortie = request.POST.get('num_sortie')
         fact = request.POST.get('id_fact')
         tickets = Ticket.objects.filter(numero_ticket=ticket)
+        
         if not tickets.exists():
             compte_fact = get_object_or_404(Compte_facturation, id=1)
             ticket_model = Ticket.objects.create(
@@ -230,17 +231,25 @@ def affect_stock_equipement_view(request):
                 dateApprobation=dateApprobation,
                 compte_facturation=compte_fact,
             )
+        
         eta = get_object_or_404(Etat, id=1)
         num_tickets = Ticket.objects.filter(numero_ticket=ticket)
         article_affect = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
         article_ = Article.objects.create(
             imei1 = imei_1,
-            imei2 = imei_2,
-            imei3 = imei_3,
-            imei4 = imei_4,
-            etat = eta,
-            article_modele = article_affect,
+            etat=eta,
+            article_modele=article_affect,
         )
+        
+        if imei_2:
+            article_.imei2 = imei_2
+        if imei_3:
+            article_.imei3 = imei_3
+        if imei_4:
+            article_.imei4 = imei_4
+        
+        article_.save()
+        
         id_fact = Facture.objects.filter(num_facture=fact).values_list('id', flat=True)
         reception_article = Reception_article.objects.filter(id=id_fact[0]).first()
         sortie_ = Sortie.objects.create(
@@ -250,20 +259,70 @@ def affect_stock_equipement_view(request):
             reception_article = reception_article,
         )   
         collaborateur = Collaborateur.objects.get(matricule=collabo)
+        
         if collaborateur:
             affectation_equipement = Affectation_article.objects.create(
-                collaborateur = collaborateur,
+                collaborateur=collaborateur,
                 ticket=num_tickets.first(),
-                article = article_,
-                sortie = sortie_,
+                article=article_,
+                sortie=sortie_,
             )
-            return redirect('list_affectation_sim')
-    return render(request, 'Equipement/Affectation/affectation_equipement.html',{'articles': article})
+            
+            return redirect('affectation_list')
+      #recherche dans mouvement si artcile_modele existe
+      #si existe modification 
+      # affecte = affecte +1
+      # disponible = disponible -1
+      # si n'existe pas 
+      #creer la ligne de mouvement avec les valeurs 
+      #article_modele = article_affect
+      #affecte = 1
+    return render(request, 'Equipement/Affectation/affectation_equipement.html', {'articles': article})
+
+def affectation_update_view(request, affectation_id):
+    # Récupérez l'affectationEquipement à mettre à jour depuis la base de données
+    try:
+        affectationEquipement = Affectation_article.objects.get(id=affectation_id)
+    except Affectation_article.DoesNotExist:
+        return JsonResponse({'message': 'L\'affectationEquipement n\'existe pas.'}, status=404)
+    
+    # Vérifiez si la méthode de requête est PUT ou PATCH
+    if request.method == 'PUT' or request.method == 'PATCH':
+        # Mettez à jour les attributs de l'affectationEquipement avec les nouvelles valeurs
+        affectationEquipement.collaborateur = request.POST.get('nouvelle_valeur_collabo')
+        # Mettez à jour d'autres attributs si nécessaire
+        
+        # Enregistrez les modifications dans la base de données
+        affectationEquipement.save()
+        
+        # Retournez une réponse JSON ou une redirection appropriée
+        return JsonResponse({'message': 'affectationEquipement mis à jour avec succès.'})
+    
+    # Retournez la réponse HTML pour la vue de mise à jour
+    return render(request, 'Equipement/Affectation/affectation_edit.html', {'affectationEquipement': affectationEquipement})
+
 
 class AffectationListView(ListView):
     model = Affectation_article
     template_name = 'Equipement/Affectation/list_affectation_equipement.html'
     context_object_name = 'affectationEquipements'
+
+
+class AffectationArticleUpdateView(UpdateView):
+    model = Affectation_article
+    template_name = 'Equipement/Affectation/affectation_edit.html'
+    form_class = AffectationArticleForm
+    
+    def get_object(self, queryset=None):
+        return Affectation_article.objects.get(pk=self.kwargs['pk'])
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.instance = self.object  # Passez l'instance à votre formulaire
+        return form
+
+    def get_success_url(self):
+        return 'affectationEquipements'
 
     
 def update_stock_equipement_view(request, id_affectation):
