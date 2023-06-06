@@ -8,13 +8,14 @@ from django.views.generic import TemplateView
 from django.views.generic import ListView
 from django.views import View
 import json
+from django.contrib import messages
 from sim.models import Collaborateur, Compte_facturation, Etat, Ticket 
 from .forms import AffectationArticleForm, BcStockForm
 from .models import Affectation_article, Article, Facture, Reception_article, Sortie, Mouvement
 
 from equipement.forms import BcForm, ModeleForm, StockForm, TypeEquipementForm
 from equipement.models import Article_modele, Bc, Materiel, Reception_article
-from unidecode import unidecode
+
 # Create your views here.
 
 def equipement(request):
@@ -208,6 +209,11 @@ def stock_equipement_view(request):
 def affect_stock_equipement_view(request):
     bc = Bc.objects.all()
     article = Article_modele.objects.all()
+    result = Mouvement.objects.filter(disponible__gt=0).values_list('article_modele_id', flat=True)
+    print(result)
+    resultat=Article_modele.objects.filter(id__in=result)
+    print(resultat)
+
     if request.method == 'POST':
         ticket = request.POST.get('numeroTicket')
         dateDemande = request.POST.get('dateDemande')
@@ -217,12 +223,12 @@ def affect_stock_equipement_view(request):
         imei_2 = request.POST.get('imei_2')
         imei_3 = request.POST.get('imei_3')
         imei_4 = request.POST.get('imei_4')
-        quantiteSortie = request.POST.get('quantite')
+        quantiteSortie = int(request.POST.get('quantite'))
         numBonSortie = request.POST.get('num_bon_sortie')
         numSortie = request.POST.get('num_sortie')
         fact = request.POST.get('id_fact')
+
         tickets = Ticket.objects.filter(numero_ticket=ticket)
-        
         if not tickets.exists():
             compte_fact = get_object_or_404(Compte_facturation, id=1)
             ticket_model = Ticket.objects.create(
@@ -231,35 +237,51 @@ def affect_stock_equipement_view(request):
                 dateApprobation=dateApprobation,
                 compte_facturation=compte_fact,
             )
-        
+
         eta = get_object_or_404(Etat, id=1)
         num_tickets = Ticket.objects.filter(numero_ticket=ticket)
         article_affect = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
         article_ = Article.objects.create(
-            imei1 = imei_1,
+            imei1=imei_1,
             etat=eta,
             article_modele=article_affect,
         )
-        
+
         if imei_2:
             article_.imei2 = imei_2
         if imei_3:
             article_.imei3 = imei_3
         if imei_4:
             article_.imei4 = imei_4
-        
+
         article_.save()
-        
+
         id_fact = Facture.objects.filter(num_facture=fact).values_list('id', flat=True)
-        reception_article = Reception_article.objects.filter(id=id_fact[0]).first()
-        sortie_ = Sortie.objects.create(
-            quantiteSortie = quantiteSortie,
-            numBonSortie = numBonSortie,
-            numSortie = numSortie,
-            reception_article = reception_article,
-        )   
-        collaborateur = Collaborateur.objects.get(matricule=collabo)
+        reception_article = Reception_article.objects.get(id=id_fact[0])
+        quantite_totale = reception_article.quantite
         
+        # Article_modele.objects.filter(id__in=Subquery( Mouvement.objects.filter(disponible__gt=0).values('article_modele_id')))
+        
+        mouvement, created = Mouvement.objects.get_or_create(article_modele=article_affect)
+        mouvement.affecte += 1
+
+        mouvement.disponible -= 1
+        mouvement.save()
+        # dispo = mouvement.disponible
+        # print(dispo)
+
+        # if dispo <= 0:
+        #     return render(request, 'Equipement/Affectation/affectation_equipement.html', context={'message': 'stock epuisé', 'articles': article})
+        # else:
+        #     
+        sortie_ = Sortie.objects.create(
+            quantiteSortie=quantiteSortie,
+            numBonSortie=numBonSortie,
+            numSortie=numSortie,
+            reception_article=reception_article,
+        )
+
+        collaborateur = Collaborateur.objects.get(matricule=collabo)
         if collaborateur:
             affectation_equipement = Affectation_article.objects.create(
                 collaborateur=collaborateur,
@@ -267,17 +289,10 @@ def affect_stock_equipement_view(request):
                 article=article_,
                 sortie=sortie_,
             )
-            
             return redirect('affectation_list')
-      #recherche dans mouvement si artcile_modele existe
-      #si existe modification 
-      # affecte = affecte +1
-      # disponible = disponible -1
-      # si n'existe pas 
-      #creer la ligne de mouvement avec les valeurs 
-      #article_modele = article_affect
-      #affecte = 1
-    return render(request, 'Equipement/Affectation/affectation_equipement.html', {'articles': article})
+
+    return render(request, 'Equipement/Affectation/affectation_equipement.html', {'articles': resultat})
+
 
 def affectation_update_view(request, affectation_id):
     # Récupérez l'affectationEquipement à mettre à jour depuis la base de données
@@ -416,7 +431,25 @@ def reception_stock_equipement_view(request):
             facture=facture_,
             article_modele=reference,
         )
-        return redirect('list_affectation_sim')
+        #filtrer mouvement si article_modele = reference
+        #si n'existe pas => create mouvement 
+        #disponible = qt
+        #si existe =>update mouvement
+        #disponible = disponible + qte
+        mouvement = Mouvement.objects.all()
+        
+        exist = Mouvement.objects.filter(article_modele=reference)
+        if not exist:
+            exist = Mouvement.objects.create(
+                disponible = qt,
+                article_modele = reference,
+            )
+        else:
+            exist = exist.first()  # Sélectionner le premier objet de la requête existante
+            exist.disponible += int(qt)  # Ajouter qte à la valeur existante de disponible
+            exist.save()  # Enregistrer les modifications dans la base de données
+            
+        return redirect('affectation_list')
     return render(request, 'Equipement/Reception/stock_equipement.html', {'articles': articles})
 
 def get_materiel(request):

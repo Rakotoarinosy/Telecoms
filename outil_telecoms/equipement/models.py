@@ -85,10 +85,10 @@ class Article_sim(models.Model):
     affectation_article = models.ForeignKey(Affectation_article,on_delete=models.SET_NULL,null=True)
     sim = models.ForeignKey(Sim,on_delete=models.SET_NULL,null=True)    
 
-
 class Mouvement(models.Model):
-     disponible=  models.IntegerField(verbose_name="Disponible")
-     inactif=  models.IntegerField(verbose_name="Inactif")
-     affecte=  models.IntegerField(verbose_name="Affecte")
-     article_modele = models.ForeignKey(Article_modele,on_delete=models.SET_NULL,null=True)
-     
+    article_modele = models.OneToOneField(Article_modele, on_delete=models.SET_NULL,null=True)
+    affecte = models.IntegerField(verbose_name="Quantité affectée", default=0)
+    disponible = models.IntegerField(verbose_name="Quantité disponible", default=0)
+
+    def __str__(self):
+        return str(self.article_modele)
