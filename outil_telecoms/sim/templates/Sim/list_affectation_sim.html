@@ -1,7 +1,7 @@
 {% extends '../base_sim.html' %}
 {% block titre1 %}LISTE DES SIM{% endblock titre1 %}
 {% block content %}
-<div class="table-container">
+<div style=" overflow-y: auto; white-space: nowrap;">
       <table id="profil" class="table data-table">
           <thead>
             <tr>
@@ -21,6 +21,7 @@
               <th>Numéro</th>
               <th>Adresse IP</th>
               <th>Acces</th>
+              <th>Effectif</th>
               <th>Modifier</th>
             </tr>
           </thead>
@@ -42,8 +43,9 @@
               <td>{{ affectationSim.sim.forfait.libelle}}</td>
               <td>{{ affectationSim.sim.numero }}</td>
               <td>{{ affectationSim.sim.adresseIP }}</td>
-              <td>{{ affectationSim.acces }}</td>
-              <td><a href="{% url 'update_affectation_sim' pk=affectationSim.pk %}"><i class="bi bi-pen align-items-center"></i></a></td>
+              <td>{{ affectationSim.sim.acces }}</td>
+              <td>{{ affectationSim.sim.effectif }}</td>
+              <td><a href="{% url 'affect_sim_update' pk=affectationSim.pk %}" onclick="alert( {{affectationSim.pk}} )"><i class="bi bi-pen align-items-center"></i></a></td>
             </tr>
             {% endfor %}
           </tbody>

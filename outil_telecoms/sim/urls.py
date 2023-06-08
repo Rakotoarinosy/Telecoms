@@ -53,9 +53,6 @@ urlpatterns = [
     path('type_sim/<int:pk>/update/', Type_SimUpdateView.as_view(), name='update_type_sim'),
     path('type_sim/<int:pk>/delete/', Type_SimDeleteView.as_view(), name='delete_type_sim'),
     
-    #test
-    # path('my_view/', MyFormView.as_view(),name='my_view'),
-     
     # path('list_affectation_sim/',AffectationSimListView.as_view(),name='list_affectation_sim'),
     path('test/',CombinedTest.as_view(),name='test'),
 
@@ -64,13 +61,9 @@ urlpatterns = [
     path('ticket_creat_sim/',Ticket_creat_sim.as_view(),name='ticket_creat_sim'),
     path('complet/',CombinedFormView1.as_view(),name='complet'),
     
-    
-    #division
-    # path('type_sim/',Type_SimCreateView.as_view(),name='type_sim_create_and_list'),
-    # path('division/<int:pk>/delete/', DivisionDeleteView.as_view(), name='delete_division'),
-    # path('division/<int:pk>/update/', DivisionUpdateView.as_view(), name='update_division'),
-    # path('create_division/',DivisionCreateView.as_view(),name='create_division'),
-    # path('list_division/',DivisionListView.as_view(),name='list_division'),
+    # path('sim/<int:pk>/edit/', AffectSimView.as_view(), name='sim_edit'),
+    path('affect_sim_update/<int:pk>/', affect_sim_update, name='affect_sim_update'),
+
     
     #######################################################################
     path('affect/', sim_view, name='sim_view' ),

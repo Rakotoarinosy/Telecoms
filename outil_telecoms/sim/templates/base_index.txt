@@ -1,0 +1,63 @@
+<script>
+    $(document).ready(function() {
+      // Autocomplete
+      $("#id_numphone").autocomplete({
+        source: function(request, response) {
+          // Effectuer une requête AJAX pour récupérer les suggestions de numéros de téléphone
+          $.ajax({
+            url: "/api/suggestions",  // L'URL de votre API pour récupérer les suggestions de numéros de téléphone
+            method: "GET",
+            dataType: "json",
+            data: {
+              term: request.term
+            },
+            success: function(data) {
+              response(data);
+            }
+          });
+        },
+        minLength: 3  // Le nombre minimum de caractères à saisir avant d'afficher les suggestions
+      });
+  
+      // Mise à jour instantanée
+      $("#id_numphone").on("input", function() {
+        var numphone = $(this).val();
+        var numero_existe = Sim.objects.filter(numero=numphone).exists();
+        var numero_non_affecte = !Article_sim.objects.filter(sim__numero=numphone).exists();
+  
+        if (numero_existe && numero_non_affecte) {
+          // Le numéro existe dans la table Sim et n'a pas encore été affecté dans la table Article_sim
+          var sim = Sim.objects.get(numero=numphone);
+          var article_sim_instance = Article_sim.objects.create(sim=sim);
+          console.log("Le numéro existe et n'a pas encore été affecté.");
+        } else {
+          // Le numéro n'existe pas dans la table Sim ou a déjà été affecté dans la table Article_sim
+          console.log("Le numéro n'existe pas ou a déjà été affecté.");
+        }
+      });
+    });
+  </script>
+
+
+  <script>
+    $(document).ready(function() {
+      $("#id_numphone").autocomplete({
+        source: function(request, response) {
+          // Effectuer une requête AJAX pour récupérer les suggestions de numéros de téléphone
+          $.ajax({
+            url: "/api/suggestions",  // L'URL de votre API pour récupérer les suggestions de numéros de téléphone
+            method: "GET",
+            dataType: "json",
+            data: {
+              term: request.term
+            },
+            success: function(data) {
+              response(data);
+            }
+          });
+        },
+        minLength: 3  // Le nombre minimum de caractères à saisir avant d'afficher les suggestions
+      });
+    });
+  </script>
+  

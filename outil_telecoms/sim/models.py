@@ -2,8 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 # from django.db.models.signals import pre_save
 # from django.dispatch import receiver
-from django.db.models.functions import Lower
-from unidecode import unidecode
+# from django.db.models.functions import Lower
+# from unidecode import unidecode
 
 # Create your models here.
 class Compte_facturation(models.Model):
@@ -114,9 +114,9 @@ class Sim(models.Model):
     acces = models.ForeignKey(Acces_sim,on_delete=models.SET_NULL,null=True,verbose_name="Accès")
     etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True,verbose_name="Etat")
     forfait = models.ForeignKey(Forfait,on_delete=models.SET_NULL,null=True,verbose_name="Forfait")
-    
+    effectif = models.DateField(null=True)
     def __str__(self):
-         return str(self.numero)
+        return str(self.numero)
 
 class Affectation_sim(models.Model):
     dateAffectation = models.DateField(auto_now=True,verbose_name="Date d'affectation")
