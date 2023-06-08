@@ -1,11 +1,14 @@
 from django.urls import path
 
-from equipement.views import AffectationArticleUpdateView, AffectationListView, BcCreateView, BcDeleteView, BcUpdateView, BcView, CreateStockView, ModeleCreateView, ModeleDeleteView, ModeleUpdateView, ModeleView, Reception_articleCreateView, Reception_articleDeleteView, Reception_articleUpdateView, Reception_articleView, Type_equipementCreateView, Type_equipementDeleteView, Type_equipementUpdateView, Type_equipementView, affect_stock_equipement_view, affectation_update_view, autocomplete_bc,equipement, get_materiel, reception_stock_equipement_view, stock_equipement_view, update_stock_equipement_view
+from equipement.views import AffectationArticleUpdateView, AffectationListView, BcCreateView, BcDeleteView, BcUpdateView, BcView, CreateStockView, ModeleCreateView, ModeleDeleteView, ModeleUpdateView, ModeleView, Reception_articleCreateView, Reception_articleDeleteView, Reception_articleUpdateView, Reception_articleView, Type_equipementCreateView, Type_equipementDeleteView, Type_equipementUpdateView, Type_equipementView, affect_stock_equipement_view, autocomplete_bc,equipement, get_materiel, reception_stock_equipement_view, stock_equipement_view,update_stock_equipement_view
 
 urlpatterns = [
     path('', equipement,name='equipement'),
     path('create-stock/', CreateStockView.as_view(), name='create_stock'),
     path('get_materiel/', get_materiel, name='get_materiel'),
+    # path('verifier_numero/', verifier_numero, name='verifier_numero'),
+    # path('autocomplete_numero/', autocomplete_numero, name='autocomplete_numero'),
+    # path('api/suggestions/', suggestions_api, name='suggestions_api'),
     #PARAMETRAGE
     ##paramètrage équipement
     ###type_equipement
@@ -13,6 +16,7 @@ urlpatterns = [
     path('create_type_equipement/', Type_equipementCreateView.as_view(),name='create_type_equipement'),
     path('type_equipement/<int:pk>/update/', Type_equipementUpdateView.as_view(), name='update_type_equipement'),
     path('type_equipement/<int:pk>/delete/',Type_equipementDeleteView.as_view(), name='delete_type_equipement'),
+
     ###modele
     path('modele/', ModeleView.as_view(), name='modele'),
     path('create_modele/', ModeleCreateView.as_view(),name='create_modele'),
@@ -32,11 +36,11 @@ urlpatterns = [
     path('affect_equipement/', affect_stock_equipement_view , name='affect_stock_equipement_view'),
     path('reception_equipement/', reception_stock_equipement_view , name='reception_stock_equipement_view'),
     path('autocomplete_bc/', autocomplete_bc ,name='autocomplete_bc'),
-    path('affectations/update/<int:id_affectation>/', update_stock_equipement_view , name='update_affectation'),
+    # path('affectations/update/<int:id_affectation>/', update_stock_equipement_view , name='update_affectation'),
     path('affectation_list/', AffectationListView.as_view(), name='affectation_list'),
-    path('affectation_update/<int:pk>/', AffectationArticleUpdateView.as_view(), name='affectation_update'),
-    path('affectation/update/<int:affectation_id>/', affectation_update_view, name='affectation_update'),
-    
-
-    
+    # path('affectation_update/<int:pk>/', AffectationArticleUpdateView.as_view(), name='affectation_updatea'),
+    path('affectation_update/<int:pk>/', update_stock_equipement_view, name='affectation_updatea'),
+   
+    path('affectation/update/<int:affectation_id>/', update_stock_equipement_view, name='affectation_update'),
+     
 ]

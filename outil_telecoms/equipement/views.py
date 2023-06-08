@@ -9,9 +9,9 @@ from django.views.generic import ListView
 from django.views import View
 import json
 from django.contrib import messages
-from sim.models import Collaborateur, Compte_facturation, Etat, Ticket 
+from sim.models import Collaborateur, Compte_facturation, Etat, Sim, Ticket 
 from .forms import AffectationArticleForm, BcStockForm
-from .models import Affectation_article, Article, Facture, Reception_article, Sortie, Mouvement
+from .models import Affectation_article, Article, Article_sim, Facture, Reception_article, Sortie, Mouvement
 
 from equipement.forms import BcForm, ModeleForm, StockForm, TypeEquipementForm
 from equipement.models import Article_modele, Bc, Materiel, Reception_article
@@ -207,12 +207,8 @@ def stock_equipement_view(request):
     return render(request, 'Equipement/Stock/stock_equipement.html', context=context)
 
 def affect_stock_equipement_view(request):
-    bc = Bc.objects.all()
-    article = Article_modele.objects.all()
     result = Mouvement.objects.filter(disponible__gt=0).values_list('article_modele_id', flat=True)
-    print(result)
     resultat=Article_modele.objects.filter(id__in=result)
-    print(resultat)
 
     if request.method == 'POST':
         ticket = request.POST.get('numeroTicket')
@@ -227,7 +223,8 @@ def affect_stock_equipement_view(request):
         numBonSortie = request.POST.get('num_bon_sortie')
         numSortie = request.POST.get('num_sortie')
         fact = request.POST.get('id_fact')
-
+        numphone = int(request.POST.get('id_numphone'))
+        
         tickets = Ticket.objects.filter(numero_ticket=ticket)
         if not tickets.exists():
             compte_fact = get_object_or_404(Compte_facturation, id=1)
@@ -253,27 +250,16 @@ def affect_stock_equipement_view(request):
             article_.imei3 = imei_3
         if imei_4:
             article_.imei4 = imei_4
-
         article_.save()
 
         id_fact = Facture.objects.filter(num_facture=fact).values_list('id', flat=True)
         reception_article = Reception_article.objects.get(id=id_fact[0])
-        quantite_totale = reception_article.quantite
-        
-        # Article_modele.objects.filter(id__in=Subquery( Mouvement.objects.filter(disponible__gt=0).values('article_modele_id')))
         
         mouvement, created = Mouvement.objects.get_or_create(article_modele=article_affect)
         mouvement.affecte += 1
-
         mouvement.disponible -= 1
         mouvement.save()
-        # dispo = mouvement.disponible
-        # print(dispo)
-
-        # if dispo <= 0:
-        #     return render(request, 'Equipement/Affectation/affectation_equipement.html', context={'message': 'stock epuisé', 'articles': article})
-        # else:
-        #     
+        
         sortie_ = Sortie.objects.create(
             quantiteSortie=quantiteSortie,
             numBonSortie=numBonSortie,
@@ -289,32 +275,70 @@ def affect_stock_equipement_view(request):
                 article=article_,
                 sortie=sortie_,
             )
-            return redirect('affectation_list')
+        
+        numero_existe = Sim.objects.filter(numero=numphone).exists()
+        numero_non_affecte = not Article_sim.objects.filter(sim__numero=numphone).exists()
+
+        if numero_existe and numero_non_affecte:
+            # Le numéro existe dans la table Sim et n'a pas encore été affecté dans la table Article_sim
+            sim = Sim.objects.get(numero=numphone)
+            article_sim_instance = Article_sim.objects.create(sim=sim,affectation_article=affectation_equipement)
+        else:
+            # Le numéro n'existe pas dans la table Sim ou a déjà été affecté dans la table Article_sim
+            return render(request, 'Equipement/Affectation/list_affectation_equipement.html', {'articles': resultat,'message': 'Ce numéro a déjà été affecté. Veuillez insérer un nouveau numéro.'})
 
     return render(request, 'Equipement/Affectation/affectation_equipement.html', {'articles': resultat})
 
 
-def affectation_update_view(request, affectation_id):
-    # Récupérez l'affectationEquipement à mettre à jour depuis la base de données
-    try:
-        affectationEquipement = Affectation_article.objects.get(id=affectation_id)
-    except Affectation_article.DoesNotExist:
-        return JsonResponse({'message': 'L\'affectationEquipement n\'existe pas.'}, status=404)
+# def affectation_update_view(request, affectation_id):
+#     print('test')
+#     # Récupérez l'affectationEquipement à mettre à jour depuis la base de données
+#     try:
+#         affectationEquipement = Affectation_article.objects.get(id=affectation_id)
+#     except Affectation_article.DoesNotExist:
+#         return JsonResponse({'message': 'L\'affectationEquipement n\'existe pas.'}, status=404)
     
-    # Vérifiez si la méthode de requête est PUT ou PATCH
-    if request.method == 'PUT' or request.method == 'PATCH':
-        # Mettez à jour les attributs de l'affectationEquipement avec les nouvelles valeurs
-        affectationEquipement.collaborateur = request.POST.get('nouvelle_valeur_collabo')
-        # Mettez à jour d'autres attributs si nécessaire
+#     # Vérifiez si la méthode de requête est PUT ou PATCH
+#     if request.method == 'PUT' or request.method == 'PATCH':
+#         # Mettez à jour les attributs de l'affectationEquipement avec les nouvelles valeurs
+#         affectationEquipement.collaborateur = request.POST.get('nouvelle_valeur_collabo')
+#         # Mettez à jour d'autres attributs si nécessaire
         
-        # Enregistrez les modifications dans la base de données
-        affectationEquipement.save()
+#         # Enregistrez les modifications dans la base de données
+#         affectationEquipement.save()
         
-        # Retournez une réponse JSON ou une redirection appropriée
-        return JsonResponse({'message': 'affectationEquipement mis à jour avec succès.'})
+#         # Retournez une réponse JSON ou une redirection appropriée
+#         return JsonResponse({'message': 'affectationEquipement mis à jour avec succès.'})
     
-    # Retournez la réponse HTML pour la vue de mise à jour
-    return render(request, 'Equipement/Affectation/affectation_edit.html', {'affectationEquipement': affectationEquipement})
+#     # Retournez la réponse HTML pour la vue de mise à jour
+#     return render(request, 'Equipement/Affectation/affectation_edit.html', {'affectationEquipement': affectationEquipement})
+
+def update_stock_equipement_view(request, affectation_id):
+    print('andrana')
+    article = get_object_or_404(Article, pk=affectation_id)
+    resultat = Article_modele.objects.all()
+    print(resultat)
+
+    if request.method == 'POST':
+        imei_1 = request.POST.get('imei_1')
+        imei_2 = request.POST.get('imei_2')
+        imei_3 = request.POST.get('imei_3')
+        imei_4 = request.POST.get('imei_4')
+        
+        print(imei_1 )
+
+        article.imei1 = imei_1
+        article.imei2 = imei_2 if imei_2 else None
+        article.imei3 = imei_3 if imei_3 else None
+        article.imei4 = imei_4 if imei_4 else None
+
+        article.save()
+
+        # Rediriger vers la page de détail ou afficher un message de succès
+        # return HttpResponseRedirect(reverse('affectation_detail', args=[article.pk]))
+        return render(request, 'Equipement/Affectation/list_affectation_equipement.html')
+
+    return render(request, 'Equipement/Affectation/affectation_edit.html', {'article': article, 'articles': resultat})
 
 
 class AffectationListView(ListView):
@@ -340,64 +364,64 @@ class AffectationArticleUpdateView(UpdateView):
         return 'affectationEquipements'
 
     
-def update_stock_equipement_view(request, id_affectation):
-    affectation = get_object_or_404(Affectation_article, id=id_affectation)
-    bc = Bc.objects.all()
-    article = Article_modele.objects.all()
+# def update_stock_equipement_view(request, id_affectation):
+#     affectation = get_object_or_404(Affectation_article, id=id_affectation)
+#     bc = Bc.objects.all()
+#     article = Article_modele.objects.all()
 
-    if request.method == 'POST':
-        ticket = request.POST.get('numeroTicket')
-        dateDemande = request.POST.get('dateDemande')
-        dateApprobation = request.POST.get('dateApprobation')
-        collabo = request.POST.get('matricule')
-        imei_1 = request.POST.get('imei_1')
-        imei_2 = request.POST.get('imei_2')
-        imei_3 = request.POST.get('imei_3')
-        imei_4 = request.POST.get('imei_4')
-        quantiteSortie = request.POST.get('quantite')
-        numBonSortie = request.POST.get('num_bon_sortie')
-        numSortie = request.POST.get('num_sortie')
-        fact = request.POST.get('id_fact')
-        tickets = Ticket.objects.filter(numero_ticket=ticket)
-        if not tickets.exists():
-            compte_fact = get_object_or_404(Compte_facturation, id=1)
-            ticket_model = Ticket.objects.create(
-                numero_ticket=ticket,
-                dateDemande=dateDemande,
-                dateApprobation=dateApprobation,
-                compte_facturation=compte_fact,
-            )
-        eta = get_object_or_404(Etat, id=1)
-        num_tickets = Ticket.objects.filter(numero_ticket=ticket)
-        article_affect = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
-        article_ = Article.objects.create(
-            imei1 = imei_1,
-            imei2 = imei_2,
-            imei3 = imei_3,
-            imei4 = imei_4,
-            etat = eta,
-            article_modele = article_affect,
-        )
-        id_fact = Facture.objects.filter(num_facture=fact).values_list('id', flat=True)
-        reception_article = Reception_article.objects.filter(id=id_fact[0]).first()
-        sortie_ = Sortie.objects.create(
-            quantiteSortie = quantiteSortie,
-            numBonSortie = numBonSortie,
-            numSortie = numSortie,
-            reception_article = reception_article,
-        )   
-        collaborateur = Collaborateur.objects.get(matricule=collabo)
-        if collaborateur:
-            affectation_equipement = Affectation_article.objects.create(
-                collaborateur = collaborateur,
-                ticket=num_tickets.first(),
-                article = article_,
-                sortie = sortie_,
-            )
+#     if request.method == 'POST':
+#         ticket = request.POST.get('numeroTicket')
+#         dateDemande = request.POST.get('dateDemande')
+#         dateApprobation = request.POST.get('dateApprobation')
+#         collabo = request.POST.get('matricule')
+#         imei_1 = request.POST.get('imei_1')
+#         imei_2 = request.POST.get('imei_2')
+#         imei_3 = request.POST.get('imei_3')
+#         imei_4 = request.POST.get('imei_4')
+#         quantiteSortie = request.POST.get('quantite')
+#         numBonSortie = request.POST.get('num_bon_sortie')
+#         numSortie = request.POST.get('num_sortie')
+#         fact = request.POST.get('id_fact')
+#         tickets = Ticket.objects.filter(numero_ticket=ticket)
+#         if not tickets.exists():
+#             compte_fact = get_object_or_404(Compte_facturation, id=1)
+#             ticket_model = Ticket.objects.create(
+#                 numero_ticket=ticket,
+#                 dateDemande=dateDemande,
+#                 dateApprobation=dateApprobation,
+#                 compte_facturation=compte_fact,
+#             )
+#         eta = get_object_or_404(Etat, id=1)
+#         num_tickets = Ticket.objects.filter(numero_ticket=ticket)
+#         article_affect = get_object_or_404(Article_modele, id=request.POST.get('id_articleReference'))
+#         article_ = Article.objects.create(
+#             imei1 = imei_1,
+#             imei2 = imei_2,
+#             imei3 = imei_3,
+#             imei4 = imei_4,
+#             etat = eta,
+#             article_modele = article_affect,
+#         )
+#         id_fact = Facture.objects.filter(num_facture=fact).values_list('id', flat=True)
+#         reception_article = Reception_article.objects.filter(id=id_fact[0]).first()
+#         sortie_ = Sortie.objects.create(
+#             quantiteSortie = quantiteSortie,
+#             numBonSortie = numBonSortie,
+#             numSortie = numSortie,
+#             reception_article = reception_article,
+#         )   
+#         collaborateur = Collaborateur.objects.get(matricule=collabo)
+#         if collaborateur:
+#             affectation_equipement = Affectation_article.objects.create(
+#                 collaborateur = collaborateur,
+#                 ticket=num_tickets.first(),
+#                 article = article_,
+#                 sortie = sortie_,
+#             )
 
-        return redirect('list_affectation_sims')
+#         return redirect('list_affectation_sims')
 
-    return render(request, 'Equipement/Affectation/affectation_edit.html', {'affectation': affectation, 'articles': article})
+#     return render(request, 'Equipement/Affectation/affectation_edit.html', {'affectation': affectation, 'articles': article})
 
 
 def reception_stock_equipement_view(request):
@@ -410,6 +434,7 @@ def reception_stock_equipement_view(request):
         dateFacture = request.POST.get('dateFacture')
         bc = request.POST.get('ref_bc')
         dateBc = request.POST.get('dateBc')
+
         facture_ = Facture.objects.filter(num_facture=facture).first()
         if not facture_:
             facture_ = Facture.objects.create(
@@ -431,25 +456,25 @@ def reception_stock_equipement_view(request):
             facture=facture_,
             article_modele=reference,
         )
+
+        # mouvement = Mouvement.objects.all()
         #filtrer mouvement si article_modele = reference
         #si n'existe pas => create mouvement 
         #disponible = qt
-        #si existe =>update mouvement
-        #disponible = disponible + qte
-        mouvement = Mouvement.objects.all()
-        
         exist = Mouvement.objects.filter(article_modele=reference)
         if not exist:
             exist = Mouvement.objects.create(
                 disponible = qt,
                 article_modele = reference,
             )
+        #si existe =>update mouvement
         else:
             exist = exist.first()  # Sélectionner le premier objet de la requête existante
+            #disponible = disponible + qte
             exist.disponible += int(qt)  # Ajouter qte à la valeur existante de disponible
-            exist.save()  # Enregistrer les modifications dans la base de données
-            
+            exist.save()  # Enregistrer les modifications dans la base de données            
         return redirect('affectation_list')
+    
     return render(request, 'Equipement/Reception/stock_equipement.html', {'articles': articles})
 
 def get_materiel(request):

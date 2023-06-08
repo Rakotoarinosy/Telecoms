@@ -50,10 +50,10 @@ class Article_modele(models.Model):
         return self.reference_modele
 
 class Article(models.Model):
-    imei1 = models.IntegerField(verbose_name="IMEI 1")
-    imei2 = models.IntegerField(verbose_name="IMEI 2",blank=True,null=True)
-    imei3 = models.IntegerField(verbose_name="IMEI 3",blank=True,null=True)
-    imei4 = models.IntegerField(verbose_name="IMEI 4",blank=True,null=True)
+    imei1 = models.CharField(verbose_name="IMEI 1",max_length=17)
+    imei2 = models.CharField(verbose_name="IMEI 2",max_length=17,blank=True,null=True)
+    imei3 = models.CharField(verbose_name="IMEI 3",max_length=17,blank=True,null=True)
+    imei4 = models.CharField(verbose_name="IMEI 4",max_length=17,blank=True,null=True)
     etat = models.ForeignKey(Etat,on_delete=models.SET_NULL,null=True)
     article_modele = models.ForeignKey(Article_modele,on_delete=models.SET_NULL,null=True)
 
